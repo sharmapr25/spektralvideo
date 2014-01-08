@@ -1,7 +1,7 @@
 //////////////////////
 ////SPEKTRAL VIDEO
 //////////////////////
-function SpektralVideo(parent, path, params) {
+function SpektralVideo(container, path, params) {
 
     //Private Var
     //var objectID = id;
@@ -27,11 +27,14 @@ function SpektralVideo(parent, path, params) {
     //Private Vars
     var 
         SpektralVideo = this,
-        parent, path, width, height, autoplay, useDefaultControls;
+        container, path, width, height, autoplay, useDefaultControls;
 
-    //Parent
-    //If no parent is defined, use body
-    parent = params.parent || document.body;
+    //Container
+    //If no container is defined, use body
+    //Also if container is an existing video 
+    //element, don't generate a video element,
+    //use the existing one
+    container = container || document.body;
 
     //Path
     //If no path is defined, then wait for loadVideo()
@@ -216,6 +219,8 @@ function SpektralVideo(parent, path, params) {
         //480 - 854 x 480
         //720 - 1280 x 720
         //1080 - 1920 x 1080
+
+        //https://support.google.com/youtube/answer/1722171?hl=en
     }
 
     ///////////////////////
@@ -230,5 +235,37 @@ function SpektralVideo(parent, path, params) {
     //////////////////////
     SpektralVideo.setHeight = function () {
         //Sets the height of the video
+    }
+
+    ///////////////////////
+    ////SET FRAME RATE
+    //////////////////////
+    SpektralVideo.setFrameRate = function (rate) {
+        //Not sure if this is doable
+        //Will look into
+    }
+
+    ///////////////////////
+    ////GET CURRENT TIME
+    //////////////////////
+    SpektralVideo.getCurrentTime = function () {
+        //Returns time in seconds
+    }
+
+    //////////////////////
+    ////GET TOTAL TIME
+    //////////////////////
+    SpektralVideo.getTotalTime = function () {
+        //Returns time in seconds
+    }
+
+    //////////////////////
+    ////FORMAT TIME
+    //////////////////////
+    SpektralVideo.formatTime = function () {
+        //Possible formats
+        //minutes/seconds
+        //hours/minutes/seconds
+        //milliseconds if possible
     }
 };
