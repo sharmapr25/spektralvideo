@@ -35,6 +35,9 @@ function SpektralVideo(parent, path, params) {
 
     //Path
     //If no path is defined, then wait for loadVideo()
+    //Path can be a string or and object
+    //If an object it will look something like this:
+    //{"mp4" : "video.mp4", "ogg" : "video.ogg", "webm" : "video.webm"}
     path = params.path || "none";
 
     //width - default: 640
@@ -67,6 +70,9 @@ function SpektralVideo(parent, path, params) {
 
         //Loads video and determines if it needs to autoplay 
         //or preload a percentage of the video 
+        //Path can be either a string or an object
+        //If an object it will look something like this:
+        //{"mp4" : "video.mp4", "ogg" : "video.ogg", "webm" : "video.webm"}
     }
 
     ///////////////////////
