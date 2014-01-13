@@ -17,7 +17,21 @@ function SpektralVideo(container, instanceID, params) {
         autoplay = autoplay || false;
         preload = 25;
 
-        sv.log("loadFile: path: " + path);
+        var 
+            pathType = getType(newPath),
+            videoType;
+
+        if (pathType === "string") {
+            //single path
+            videoType = getExtension(newPath);
+            createSourceElement(newPath, videoType);
+
+            sv.log("loadFile: videoType: " + videoType);
+        } else {
+            //object, multiple formats
+        }
+
+        sv.log("loadFile: path: " + pathType);
 
         //Loads video and determines if it needs to autoplay 
         //or preload a percentage of the video 
@@ -299,18 +313,46 @@ function SpektralVideo(container, instanceID, params) {
     ////CREATE VIDEO ELEMENT
     //////////////////////
     function createVideoElement(elID) {
+
         videoElement = document.createElement("video");
+        
         createSetAttribute(videoElement, "width", width);
         createSetAttribute(videoElement, "height", height);
-        
 
         //Add video element to container
         container.appendChild(videoElement);
+        setBrowserWarning();
         //sv.log("createVideoElement!! container: " + container + " videoElement: " + videoElement);
     }
 
+    ///////////////////////
+    ////CREATE SOURCE ELEMENT
+    //////////////////////
+    function createSourceElement(source, type) {
+
+        var sourceElem = document.createElement("source");
+
+        createSetAttribute(sourceElem, "src", source);
+        createSetAttribute(sourceElem, "type", "video/" + type);
+
+        videoElement.appendChild(sourceElem);
+    }
+
+    ///////////////////////
+    ////CREATE SET ATTRIBUTE
+    //////////////////////
     function createSetAttribute(element, attribute, value) {
         element.setAttribute(attribute, value);
+    }
+
+    ///////////////////////
+    ////SET BROWSER WARNING
+    //////////////////////
+    function setBrowserWarning(message) {
+
+        message = message || "Your browser does not support HTML5 video. Please upgrade your browser."
+
+        videoElement.innerHTML = message;
     }
 
     //UTILS
@@ -322,8 +364,42 @@ function SpektralVideo(container, instanceID, params) {
         return JSON.stringify(obj);
     }
 
+    ///////////////////////
+    ////GET TYPE
+    //////////////////////
+    function getType(obj) {
+        var type;
+        if(obj.nodeName !== undefined) {
+            //element
+            type = (obj.nodeName);
+        } else {
+            //everything else
+            type = ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1]
+        }
+        type = type.toLowerCase();
+        return type;
+    }
 
-    //INITIALIZE THE VIDEO
+    ///////////////////////
+    ////GET EXTENSION
+    //////////////////////
+    function getExtension(file) {
+        return file.split(".").pop();
+    }
+
+    ///////////////////////
+    ////GET INNER TEXT
+    //////////////////////
+    function getInnerText(element) {
+        var content = element.textContent;
+        if (content === undefined) {
+            content = element.innerText;
+        }
+        return content;
+    }
+
+
+    //INITIALIZE THE VIDEO**************************************************************
     initVideo();
 
     ///////////////////////
