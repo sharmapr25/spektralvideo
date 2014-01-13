@@ -1,0 +1,9 @@
+#mainContent {
+  position: relative;
+  margin: 0 auto;
+}
+video {
+  margin: 0;
+  padding: 0;
+  background-color: #000;
+}

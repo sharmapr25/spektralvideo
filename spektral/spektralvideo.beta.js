@@ -7,15 +7,17 @@ function SpektralVideo(container, instanceID, params) {
     var 
         sv = this,
         container, path, width, height, autoplay, useDefaultControls,
-        debug = false, strictError = false, videoID = instanceID;
+        debug = false, strictError = false, videoElement;
 
     ///////////////////////
     ////LOAD FILE
     //////////////////////
-    sv.loadFile = function (path, autoplay, preload) {
+    sv.loadFile = function (newPath, autoplay, preload) {
 
         autoplay = autoplay || false;
         preload = 25;
+
+        sv.log("loadFile: path: " + path);
 
         //Loads video and determines if it needs to autoplay 
         //or preload a percentage of the video 
@@ -43,7 +45,6 @@ function SpektralVideo(container, instanceID, params) {
         //Pauses the video,
         //If video is already paused - does nothing
         //pause();
-        console.log("PAUSE: " + instanceID);
     }
 
     ///////////////////////
@@ -250,7 +251,9 @@ function SpektralVideo(container, instanceID, params) {
     //Also if container is an existing video 
     //element, don't generate a video element,
     //use the existing one
-    container = container || document.body;
+    // if (container === null || container === undefined) {
+    //     sv.log("container is not set.", "warn");
+    // }
 
     if(params === undefined) {
         //No param set, set defaults
@@ -292,15 +295,25 @@ function SpektralVideo(container, instanceID, params) {
 
     //useDefaultControls = params.useDefaultControls || false;
 
-    initVideo();
-
     ///////////////////////
-    ////INIT VIDEO
+    ////CREATE VIDEO ELEMENT
     //////////////////////
-    function initVideo() {
-        //Will create the video upon the creation of a new video
-        sv.log("INIT VIDEO");
+    function createVideoElement(elID) {
+        videoElement = document.createElement("video");
+        createSetAttribute(videoElement, "width", width);
+        createSetAttribute(videoElement, "height", height);
+        
+
+        //Add video element to container
+        container.appendChild(videoElement);
+        //sv.log("createVideoElement!! container: " + container + " videoElement: " + videoElement);
     }
+
+    function createSetAttribute(element, attribute, value) {
+        element.setAttribute(attribute, value);
+    }
+
+    //UTILS
 
     ///////////////////////
     ////GET INFO
@@ -309,5 +322,18 @@ function SpektralVideo(container, instanceID, params) {
         return JSON.stringify(obj);
     }
 
-    console.log("SpektralVideo: " + JSON.stringify(this));
+
+    //INITIALIZE THE VIDEO
+    initVideo();
+
+    ///////////////////////
+    ////INIT VIDEO
+    //////////////////////
+    function initVideo() {
+        //Will create the video upon the creation of a new video
+        sv.log("INIT VIDEO");
+        createVideoElement(instanceID);
+    }
+
+    //console.log("SpektralVideo: " + JSON.stringify(this));
 };
