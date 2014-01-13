@@ -1,72 +1,18 @@
 //////////////////////
 ////SPEKTRAL VIDEO
 //////////////////////
-function SpektralVideo(container, path, params) {
-
-    //Private Var
-    //var objectID = id;
-
-    //Public Var
-    //this.id = id;
-
-    //Private Method
-    //function privateMethod() {
-    //    console.log(this.id + "'s private method called via publicMethod");
-    //}
-
-    //Public Method
-    //this.publicMethod = function () {
-    //    console.log("You Called: " + this.id + " through a public method.");
-    //    privateMethod();
-    //}
-
-    //console.log("MyObject: id: " + objectID + " info: " + JSON.stringify(this));
-
-    //Optional parameters upon intialization
+function SpektralVideo(container, instanceID, params) {
 
     //Private Vars
     var 
-        SpektralVideo = this,
-        container, path, width, height, autoplay, useDefaultControls;
-
-    //Container
-    //If no container is defined, use body
-    //Also if container is an existing video 
-    //element, don't generate a video element,
-    //use the existing one
-    container = container || document.body;
-
-    //Path
-    //If no path is defined, then wait for loadVideo()
-    //Path can be a string or and object
-    //If an object it will look something like this:
-    //{"mp4" : "video.mp4", "ogg" : "video.ogg", "webm" : "video.webm"}
-    path = params.path || "none";
-
-    //width - default: 640
-    width = params.width || 640;
-
-    //height - default: 320
-    height = params.height || 320;
-
-    autoplay = params.autoplay || false;
-
-    useDefaultControls = params.useDefaultControls || false;
-
-    initVideo();
-
-    ///////////////////////
-    ////INIT VIDEO
-    //////////////////////
-    function initVideo() {
-
-        //Will create the video upon the creation of a new video
-    }
+        sv = this,
+        container, path, width, height, autoplay, useDefaultControls,
+        debug = false, strictError = false, videoID = instanceID;
 
     ///////////////////////
     ////LOAD FILE
     //////////////////////
-    SpektralVideo.loadFile = function (path, autoplay, preload) {
+    sv.loadFile = function (path, autoplay, preload) {
 
         autoplay = autoplay || false;
         preload = 25;
@@ -81,7 +27,7 @@ function SpektralVideo(container, path, params) {
     ///////////////////////
     ////PLAY
     //////////////////////
-    SpektralVideo.play = function (time) {
+    sv.play = function (time) {
 
         time = time || 0;
 
@@ -93,15 +39,17 @@ function SpektralVideo(container, path, params) {
     ///////////////////////
     ////PAUSE
     //////////////////////
-    SpektralVideo.pause = function () {
+    sv.pause = function () {
         //Pauses the video,
         //If video is already paused - does nothing
+        //pause();
+        console.log("PAUSE: " + instanceID);
     }
 
     ///////////////////////
     ////TOGGLE PAUSE
     //////////////////////
-    SpektralVideo.togglePause = function () {
+    sv.togglePause = function () {
         //Pauses and unpauses the video
         //depending on its current state
     }
@@ -109,14 +57,14 @@ function SpektralVideo(container, path, params) {
     ///////////////////////
     ////STOP
     //////////////////////
-    SpektralVideo.stop = function () {
+    sv.stop = function () {
         //Stops video playback
     }
 
     ///////////////////////
     ////SEEK
     //////////////////////
-    SpektralVideo.seek = function (time, scrub) {
+    sv.seek = function (time, scrub) {
 
         scrub = scrub || false;
 
@@ -133,7 +81,7 @@ function SpektralVideo(container, path, params) {
     ///////////////////////
     ////REWIND
     //////////////////////
-    SpektralVideo.rewind = function (speed) {
+    sv.rewind = function (speed) {
 
         speed = speed || 1;
 
@@ -146,7 +94,7 @@ function SpektralVideo(container, path, params) {
     ///////////////////////
     ////FAST FORWARD
     //////////////////////
-    SpektralVideo.fastForward = function (speed) {
+    sv.fastForward = function (speed) {
 
         speed = speed || 1;
 
@@ -159,7 +107,7 @@ function SpektralVideo(container, path, params) {
     ///////////////////////
     ////PLAYBACK SPEED
     //////////////////////
-    SpektralVideo.playbackSpeed = function (speed) {
+    sv.playbackSpeed = function (speed) {
 
         speed = speed || 1;
 
@@ -170,7 +118,7 @@ function SpektralVideo(container, path, params) {
     ///////////////////////
     ////SET VOLUME
     //////////////////////
-    SpektralVideo.setVolume = function (level) {
+    sv.setVolume = function (level) {
 
         level = level || 1;
 
@@ -182,7 +130,7 @@ function SpektralVideo(container, path, params) {
     ///////////////////////
     ////MUTE
     //////////////////////
-    SpektralVideo.mute = function () {
+    sv.mute = function () {
         //Mutes the volume and 
         //remembers the current volume
     }
@@ -190,7 +138,7 @@ function SpektralVideo(container, path, params) {
     ///////////////////////
     ////UNMUTE
     //////////////////////
-    SpektralVideo.unmute = function () {
+    sv.unmute = function () {
         //Unmutes the volume
         //returns volume back to 
         //original level
@@ -199,14 +147,14 @@ function SpektralVideo(container, path, params) {
     ///////////////////////
     ////TOGGLE MUTE
     //////////////////////
-    SpektralVideo.toggleMute = function () {
+    sv.toggleMute = function () {
         //Toggles the mute on and off
     }
 
     ///////////////////////
     ////SET SIZE
     //////////////////////
-    SpektralVideo.setSize =  function (sizeParams) {
+    sv.setSize =  function (sizeParams) {
 
         //sizeParams can either be an object or string
         //If an object it should look like this: 
@@ -226,21 +174,21 @@ function SpektralVideo(container, path, params) {
     ///////////////////////
     ////SET WIDTH
     //////////////////////
-    SpektralVideo.setWidth = function () {
+    sv.setWidth = function () {
         //Sets the width of the video
     }
 
     ///////////////////////
     ////SET HEIGHT
     //////////////////////
-    SpektralVideo.setHeight = function () {
+    sv.setHeight = function () {
         //Sets the height of the video
     }
 
     ///////////////////////
     ////SET FRAME RATE
     //////////////////////
-    SpektralVideo.setFrameRate = function (rate) {
+    sv.setFrameRate = function (rate) {
         //Not sure if this is doable
         //Will look into
     }
@@ -248,24 +196,118 @@ function SpektralVideo(container, path, params) {
     ///////////////////////
     ////GET CURRENT TIME
     //////////////////////
-    SpektralVideo.getCurrentTime = function () {
+    sv.getCurrentTime = function () {
         //Returns time in seconds
     }
 
     //////////////////////
     ////GET TOTAL TIME
     //////////////////////
-    SpektralVideo.getTotalTime = function () {
+    sv.getTotalTime = function () {
         //Returns time in seconds
     }
 
     //////////////////////
     ////FORMAT TIME
     //////////////////////
-    SpektralVideo.formatTime = function () {
+    sv.formatTime = function () {
         //Possible formats
         //minutes/seconds
         //hours/minutes/seconds
         //milliseconds if possible
     }
+
+    //////////////////////
+    ////LOG
+    //////////////////////
+    sv.log = function (message, method, obj) {
+
+        method = method || "log";
+
+        var err, ID = "SpektralVideo: " + instanceID + ": ";
+
+        if (debug) {
+            if(method === "dir") {
+                console.log(ID + message);
+                console.dir(obj);
+            } else if (method === "warn") {
+                if(strictError === false) {
+                    console.warn(ID + message);
+                } else {
+                    err = new Error(ID + message);
+                }
+            } else {
+                console.log(ID + message);
+            }
+        }
+    }
+
+    //////////////////////////////////
+    /////PARAMS
+    //////////////////////////////////
+    //Container
+    //If no container is defined, use body
+    //Also if container is an existing video 
+    //element, don't generate a video element,
+    //use the existing one
+    container = container || document.body;
+
+    if(params === undefined) {
+        //No param set, set defaults
+        path = "none";
+        width = 640;
+        height = 320;
+        autoplay = false;
+        useDefaultControls = false;
+    } else {
+        debug = params.debug || false;
+        path = params.path || "none";
+        width = params.width || 640;//Going to see if I can get the videos native width, instead of 640
+        height = params.height || 320;
+        autoplay = params.autoplay || false;
+        useDefaultControls = params.useDefaultControls || false;
+    }
+
+    sv.log("setParams: debug: " + debug + 
+            " path: " + path + 
+            " width: " + width + 
+            " height: " + height + 
+            " autoplay: " + autoplay + 
+            " useDefaultControls: " + useDefaultControls);
+
+    //Path
+    //If no path is defined, then wait for loadVideo()
+    //Path can be a string or and object
+    //If an object it will look something like this:
+    //{"mp4" : "video.mp4", "ogg" : "video.ogg", "webm" : "video.webm"}
+    //path = params.path || "none";
+
+    //width - default: 640
+    //width = params.width || 640;
+
+    //height - default: 320
+    //height = params.height || 320;
+
+    //autoplay = params.autoplay || false;
+
+    //useDefaultControls = params.useDefaultControls || false;
+
+    initVideo();
+
+    ///////////////////////
+    ////INIT VIDEO
+    //////////////////////
+    function initVideo() {
+        //Will create the video upon the creation of a new video
+        sv.log("INIT VIDEO");
+    }
+
+    ///////////////////////
+    ////GET INFO
+    //////////////////////
+    function getInfo(obj) {
+        return JSON.stringify(obj);
+    }
+
+    console.log("SpektralVideo: " + JSON.stringify(this));
 };
