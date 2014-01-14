@@ -5,13 +5,16 @@
 }
 #videoContainer {
   position: relative;
-  margin: 0 auto;
+  margin: 0;
   background-color: #000;
-  width: 640px;
+  width: auto;
+  height: auto;
 }
 video {
-  margin: 0;
+  position: relative;
+  margin: 0 auto;
   padding: 0;
+  background-color: #666;
 }
 #controlsContainer {
   position: relative;

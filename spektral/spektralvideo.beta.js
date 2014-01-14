@@ -25,7 +25,6 @@ function SpektralVideo(container, instanceID, params) {
             //single path
             videoType = getExtension(newPath);
             createSourceElement(newPath, videoType);
-
             sv.log("loadFile: videoType: " + videoType);
         } else {
             //object, multiple formats
@@ -281,8 +280,8 @@ function SpektralVideo(container, instanceID, params) {
     } else {
         debug = params.debug || false;
         path = params.path || "none";
-        width = params.width || 640;//Going to see if I can get the videos native width, instead of 640
-        height = params.height || 320;
+        width = params.width;//Going to see if I can get the videos native width, instead of 640
+        height = params.height;
         autoplay = params.autoplay || false;
         useDefaultControls = params.useDefaultControls || false;
     }
@@ -317,9 +316,8 @@ function SpektralVideo(container, instanceID, params) {
     function createVideoElement(elID) {
 
         videoElement = document.createElement("video");
-        
-        createSetAttribute(videoElement, "width", width);
-        createSetAttribute(videoElement, "height", height);
+
+        attachEventListener(videoElement, "loadedmetadata", onLoadedMetaData);
 
         //Add video element to container
         container.appendChild(videoElement);
@@ -338,6 +336,23 @@ function SpektralVideo(container, instanceID, params) {
         createSetAttribute(sourceElem, "type", "video/" + type);
 
         videoElement.appendChild(sourceElem);
+    }
+
+    ///////////////////////
+    ////ON LOADED META DATA
+    //////////////////////
+    function onLoadedMetaData(evt) {
+        sv.log("Meta Data Loaded");
+
+        if (width === undefined) {
+            width = videoElement.videoWidth;
+            createSetAttribute(videoElement, "width", width);
+        }
+
+        if (height === undefined) {
+            height = videoElement.videoHeight;
+            createSetAttribute(videoElement, "height", height);
+        }
     }
 
     ///////////////////////
@@ -400,6 +415,34 @@ function SpektralVideo(container, instanceID, params) {
         return content;
     }
 
+    //////////////////
+    ////ATTACH EVENT LISTENER
+    /////////////////
+    function attachEventListener(eventTarget, eventType, eventHandler) {
+        if (eventTarget.addEventListener) {
+            eventTarget.addEventListener(eventType, eventHandler, false);
+        } else if (eventTarget.attachEvent) {
+            eventType = "on" + eventType;
+            eventTarget.attachEvent(eventType, eventHandler);
+        } else {
+            eventTarget["on" + eventType] = eventHandler;
+        }
+    }
+
+    //////////////////
+    ////DETACH EVENT LISTENER
+    /////////////////
+    function detachEventListener(eventTarget, eventType, eventHandler) {
+        if (eventTarget.removeEventListener) {
+            eventTarget.removeEventListener(eventType, eventHandler, false);
+        } else if (eventTarget.detachEvent) {
+            eventType = "on" + eventType;
+            eventTarget.detachEvent(eventType, eventHandler);
+        } else {
+            eventTarget["on" + eventType] = null;
+        }
+    }
+
 
     //INITIALIZE THE VIDEO**************************************************************
     initVideo();
@@ -414,7 +457,7 @@ function SpektralVideo(container, instanceID, params) {
 
         if (autoplay === true) {
             sv.play();
-        }
+        } 
     }
 
     //console.log("SpektralVideo: " + JSON.stringify(this));

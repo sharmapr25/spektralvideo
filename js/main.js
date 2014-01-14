@@ -10,15 +10,17 @@
     ////////////////
     ////EVENT LISTENERS
     ////////////////
-    attachEventListener(playButton, "click", onPlay);
-    attachEventListener(pauseButton, "click", onPause);
+    attachEventListener(playButton, "click", onButtonClick);
+    attachEventListener(pauseButton, "click", onButtonClick);
 
-    function onPlay(evt) {
-        theVideo.play();
-    }
+    function onButtonClick(evt) {
+        var name = evt.target.name;
 
-    function onPause(evt) {
-        theVideo.pause();
+        if(name === "play") {
+            theVideo.play();
+        } else if (name === "pause") {
+            theVideo.pause();
+        }
     }
 
     theVideo.loadFile(vidPath);
