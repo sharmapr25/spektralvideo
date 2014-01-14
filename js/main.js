@@ -1,17 +1,25 @@
 (function(){
 
     var
-        vidContainer = document.getElementById("videoContainer"),
+        vidContainer = document.getElementById("mainContent"),
         vidPath = "video/bigbuckbunny/BigBuckBunny_320x180.mp4",
         theVideo = new SpektralVideo(vidContainer, "theVideo", {"debug" : true}),
         playButton = document.getElementById("playButton"),
-        pauseButton = document.getElementById("pauseButton");
+        pauseButton = document.getElementById("pauseButton"),
+        togglePauseButton = document.getElementById("togglePauseButton"),
+        muteButton = document.getElementById("muteButton"),
+        unmuteButton = document.getElementById("unmuteButton"),
+        toggleMute = document.getElementById("toggleMuteButton");
 
     ////////////////
     ////EVENT LISTENERS
     ////////////////
     attachEventListener(playButton, "click", onButtonClick);
     attachEventListener(pauseButton, "click", onButtonClick);
+    attachEventListener(togglePauseButton, "click", onButtonClick);
+    attachEventListener(muteButton, "click", onButtonClick);
+    attachEventListener(unmuteButton, "click", onButtonClick);
+    attachEventListener(toggleMuteButton, "click", onButtonClick);
 
     function onButtonClick(evt) {
         var name = evt.target.name;
@@ -20,6 +28,14 @@
             theVideo.play();
         } else if (name === "pause") {
             theVideo.pause();
+        } else if (name === "togglePause") {
+            theVideo.togglePause();
+        } else if (name === "mute") {
+            theVideo.mute();
+        } else if (name === "unmute") {
+            theVideo.unmute();
+        } else if (name === "toggleMute") {
+            theVideo.toggleMute();
         }
     }
 

@@ -68,6 +68,11 @@ function SpektralVideo(container, instanceID, params) {
     sv.togglePause = function () {
         //Pauses and unpauses the video
         //depending on its current state
+        if (videoElement.paused === false) {
+            sv.pause();
+        } else {
+            sv.play();
+        }
     }
 
     ///////////////////////
@@ -149,6 +154,7 @@ function SpektralVideo(container, instanceID, params) {
     sv.mute = function () {
         //Mutes the volume and 
         //remembers the current volume
+        videoElement.muted = true;
     }
 
     ///////////////////////
@@ -158,6 +164,7 @@ function SpektralVideo(container, instanceID, params) {
         //Unmutes the volume
         //returns volume back to 
         //original level
+        videoElement.muted = false;
     }
 
     ///////////////////////
@@ -165,6 +172,11 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.toggleMute = function () {
         //Toggles the mute on and off
+        if (videoElement.muted === true) {
+            videoElement.muted = false;
+        } else {
+            videoElement.muted = true;
+        }
     }
 
     ///////////////////////
@@ -347,10 +359,16 @@ function SpektralVideo(container, instanceID, params) {
         if (width === undefined) {
             width = videoElement.videoWidth;
             createSetAttribute(videoElement, "width", width);
+        } else {
+            //Set predefined width
+            createSetAttribute(videoElement, "width", width);
         }
 
         if (height === undefined) {
             height = videoElement.videoHeight;
+            createSetAttribute(videoElement, "height", height);
+        } else {
+            //Set predefined height
             createSetAttribute(videoElement, "height", height);
         }
     }
@@ -443,6 +461,29 @@ function SpektralVideo(container, instanceID, params) {
         }
     }
 
+    //////////////////
+    ////CREATE EVENT
+    /////////////////
+    function createEvent(eventName, detail, bub, can) {
+
+        detail = detail || null;
+        bub = bub || true;
+        can = can || true;
+
+        var evt;
+        evt = new CustomEvent(eventName, { detail: detail, bubbles: bub, cancelable: can });
+        if(evt === undefined) {
+            evt = new Event(eventName);
+        }
+        return evt;
+    };
+
+    //////////////////
+    ////TRIGGRE EVENT
+    /////////////////
+    function triggerEvent(obj, evt) {
+        obj.dispatchEvent(evt);
+    }
 
     //INITIALIZE THE VIDEO**************************************************************
     initVideo();
@@ -453,6 +494,10 @@ function SpektralVideo(container, instanceID, params) {
     function initVideo() {
         //Will create the video upon the creation of a new video
         sv.log("INIT VIDEO");
+
+
+
+
         createVideoElement(instanceID);
 
         if (autoplay === true) {
