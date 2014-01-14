@@ -47,6 +47,8 @@ function SpektralVideo(container, instanceID, params) {
 
         time = time || 0;
 
+        videoElement.play();
+
         //Plays the video, will use the seek() method 
         //if start time isn't 0
         //time can be in seconds || minutes:seconds || hours:minutes:seconds
@@ -58,7 +60,7 @@ function SpektralVideo(container, instanceID, params) {
     sv.pause = function () {
         //Pauses the video,
         //If video is already paused - does nothing
-        //pause();
+        videoElement.pause();
     }
 
     ///////////////////////
@@ -409,6 +411,10 @@ function SpektralVideo(container, instanceID, params) {
         //Will create the video upon the creation of a new video
         sv.log("INIT VIDEO");
         createVideoElement(instanceID);
+
+        if (autoplay === true) {
+            sv.play();
+        }
     }
 
     //console.log("SpektralVideo: " + JSON.stringify(this));
