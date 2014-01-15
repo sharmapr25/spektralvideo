@@ -18,7 +18,8 @@
         seekButton = document.getElementById("seekButton"),
         speedField = document.getElementById("speedField"),
         speedButton = document.getElementById("speedButton"),
-        ffButton = document.getElementById("ffButton");
+        ffButton = document.getElementById("ffButton"),
+        rewindButton = document.getElementById("rewindButton");
 
     theVideo = new SpektralVideo(vidContainer, "theVideo", {"debug" : true});
 
@@ -36,6 +37,7 @@
     attachEventListener(seekButton, "click", onButtonClick);
     attachEventListener(speedButton, "click", onButtonClick);
     attachEventListener(ffButton, "click", onButtonClick);
+    attachEventListener(rewindButton, "click", onButtonClick);
 
     function onButtonClick(evt) {
         var
@@ -73,6 +75,8 @@
             theVideo.playbackSpeed(pbSpeed);
         } else if (name === "fastForward") {
             theVideo.fastForward();
+        } else if (name === "rewind") {
+            theVideo.rewind();
         }
     }
 
