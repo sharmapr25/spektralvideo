@@ -7,9 +7,7 @@ function SpektralVideo(container, instanceID, params) {
     var 
         sv = this,
         container, path, width, height, autoplay, useDefaultControls,
-        debug = false, strictError = false, videoElement, 
-        ffArray = [1, 2, 4, 8, 16, 32, 64], ffIndex = 0;
-
+        debug = false, strictError = false, videoElement, currentPlaybackSpeed = 1;
     ///////////////////////
     ////LOAD FILE
     //////////////////////
@@ -144,21 +142,43 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.fastForward = function () {
 
-        //will have to determine current playback speed 
-        //and set the next ff step to closest speed
-        ffIndex ++;
-        if(ffIndex >= 6) {
-            ffIndex = 6;
+        //sv.log("fastForward: currentPlaybackSpeed in: " + currentPlaybackSpeed);
+        var newSpeed = 0;
+
+        //Possible speeds: 2, 4, 8, 16, 32, 64, 128
+        //Determine what the next speed will be
+        if (currentPlaybackSpeed < 2) {
+            newSpeed = 2;
+            //sv.log("currentPlaybackSpeed < 2");
+        } else if (currentPlaybackSpeed >= 2 && currentPlaybackSpeed < 4) {
+            newSpeed = 4;
+            //sv.log("currentPlaybackSpeed >= 2 && currentPlaybackSpeed < 4");
+        } else if (currentPlaybackSpeed >= 4 && currentPlaybackSpeed < 8) {
+            newSpeed = 8;
+            //sv.log("currentPlaybackSpeed >= 4 && currentPlaybackSpeed < 8");
+        } else if (currentPlaybackSpeed >= 8 && currentPlaybackSpeed < 16) {
+            newSpeed = 16;
+            //sv.log("currentPlaybackSpeed >= 8 && currentPlaybackSpeed < 16");
+        } else if (currentPlaybackSpeed >= 16 && currentPlaybackSpeed < 32) {
+            newSpeed = 32;
+            //sv.log("currentPlaybackSpeed >= 16 && currentPlaybackSpeed < 32");
+        } else if (currentPlaybackSpeed >= 32 && currentPlaybackSpeed < 64) {
+            newSpeed = 64;
+            //sv.log("currentPlaybackSpeed >= 32 && currentPlaybackSpeed < 64");
+        } else if (currentPlaybackSpeed >= 64 && currentPlaybackSpeed < 128) {
+            newSpeed = 128;
+            //sv.log("currentPlaybackSpeed >= 64 && currentPlaybackSpeed < 128");
+        } else if (currentPlaybackSpeed >= 128 && currentPlaybackSpeed < 256) {
+            newSpeed = 256;
+            //sv.log("currentPlaybackSpeed >= 128 && currentPlaybackSpeed < 256")
+        } else {
+            newSpeed = currentPlaybackSpeed;
+            sv.log("fastForward: ELSE!!!");
         }
-
-        videoElement.playbackRate = ffArray[ffIndex];
-
-        sv.log("fastForward: " + ffArray[ffIndex]);
-
-        //Fast forwards the video
-        //speed indicates how many 
-        //times faster to fast forward
-        //Not sure if possible
+        currentPlaybackSpeed = newSpeed;
+        sv.playbackSpeed(currentPlaybackSpeed);
+        //videoElement.playbackRate = currentPlaybackSpeed;
+        sv.log("fastForward: currentPlaybackSpeed: out: " + currentPlaybackSpeed);
     } 
 
     ///////////////////////
@@ -167,12 +187,10 @@ function SpektralVideo(container, instanceID, params) {
     sv.playbackSpeed = function (speed) {
 
         speed = speed || 1;
-        videoElement.playbackRate = speed;
+        currentPlaybackSpeed = speed;
+        videoElement.playbackRate = currentPlaybackSpeed;
 
-        sv.log("playbackSpeed: " + speed);
-
-        //The speed you want to playback at
-        //Not sure if possible
+        sv.log("playbackSpeed: " + currentPlaybackSpeed);
     }
 
     ///////////////////////
