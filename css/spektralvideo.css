@@ -1,22 +1,17 @@
 #mainContent {
-  position: relative;
-  margin: 0 auto;
-  width: 100%;
+  margin: 0;
+  padding: 0;
   height: auto;
-}
-#videoContainer {
-  position: relative;
-  margin: 0 auto;
-  background-color: #000;
 }
 video {
   position: relative;
   margin: 0 auto;
   padding: 0;
-  background-color: #666;
+  width: 100%;
 }
 #controlsContainer {
   position: relative;
   margin: 0 auto;
+  width: 50%;
   background-color: #666;
 }

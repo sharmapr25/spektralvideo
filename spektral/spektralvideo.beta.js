@@ -78,8 +78,24 @@ function SpektralVideo(container, instanceID, params) {
     ///////////////////////
     ////STOP
     //////////////////////
-    sv.stop = function () {
+    sv.stop = function (stopDownload) {
         //Stops video playback
+        stopDownload = stopDownload || false;
+
+        if (stopDownload === false) {
+            sv.pause();
+            sv.seek(0);
+        } else {
+            sv.unloadVideo();
+        }
+    }
+
+    ///////////////////////
+    ////UNLOAD VIDEO
+    //////////////////////
+    sv.unloadVideo = function () {
+        sv.pause();
+        videoElement.src = "";
     }
 
     ///////////////////////
@@ -97,6 +113,9 @@ function SpektralVideo(container, instanceID, params) {
         //scrub the seek bar
         //At this moment, I'm not sure
         //if possible
+
+        videoElement.currentTime = time;
+        sv.log("seek time: " + videoElement.currentTime);
     }
 
     ///////////////////////
@@ -140,31 +159,24 @@ function SpektralVideo(container, instanceID, params) {
     ////SET VOLUME
     //////////////////////
     sv.setVolume = function (level) {
-
-        level = level || 1;
-
-        //Sets the volume of the video
-        //if called without level set
-        //resets volume
+        level = level || 100;
+        videoElement.volume = level / 100;
     }
 
     ///////////////////////
     ////MUTE
     //////////////////////
     sv.mute = function () {
-        //Mutes the volume and 
-        //remembers the current volume
         videoElement.muted = true;
+        sv.log("mute: current vol: " + videoElement.volume);
     }
 
     ///////////////////////
     ////UNMUTE
     //////////////////////
     sv.unmute = function () {
-        //Unmutes the volume
-        //returns volume back to 
-        //original level
         videoElement.muted = false;
+        sv.log("unmute: current vol: " + videoElement.volume);
     }
 
     ///////////////////////
@@ -243,6 +255,22 @@ function SpektralVideo(container, instanceID, params) {
         //minutes/seconds
         //hours/minutes/seconds
         //milliseconds if possible
+    }
+
+    //////////////////
+    ////INSERT AFTER
+    //////////////////
+    sv.insertAfter = function (targetElement) {
+        var parent = videoElement.parentNode;
+        parent.insertBefore(videoElement, targetElement.nextSibling);
+    }
+
+    //////////////////
+    ////INSERT BEFORE
+    //////////////////
+    sv.insertBefore = function (targetElement) {
+        var parent = videoElement.parentNode;
+        parent.insertBefore(videoElement, targetElement);
     }
 
     //////////////////////
@@ -328,12 +356,13 @@ function SpektralVideo(container, instanceID, params) {
     function createVideoElement(elID) {
 
         videoElement = document.createElement("video");
+        createSetAttribute(videoElement, "id", elID);
 
         attachEventListener(videoElement, "loadedmetadata", onLoadedMetaData);
 
         //Add video element to container
         container.appendChild(videoElement);
-        setBrowserWarning();
+        //setBrowserWarning();
         //sv.log("createVideoElement!! container: " + container + " videoElement: " + videoElement);
     }
 
@@ -479,7 +508,7 @@ function SpektralVideo(container, instanceID, params) {
     };
 
     //////////////////
-    ////TRIGGRE EVENT
+    ////TRIGGER EVENT
     /////////////////
     function triggerEvent(obj, evt) {
         obj.dispatchEvent(evt);
@@ -494,16 +523,11 @@ function SpektralVideo(container, instanceID, params) {
     function initVideo() {
         //Will create the video upon the creation of a new video
         sv.log("INIT VIDEO");
-
-
-
-
         createVideoElement(instanceID);
 
         if (autoplay === true) {
             sv.play();
         } 
     }
-
     //console.log("SpektralVideo: " + JSON.stringify(this));
 };
