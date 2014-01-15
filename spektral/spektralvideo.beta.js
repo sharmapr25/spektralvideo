@@ -46,7 +46,12 @@ function SpektralVideo(container, instanceID, params) {
 
         time = time || 0;
 
-        videoElement.play();
+        if (time === 0) {
+            videoElement.play();
+        } else {
+            sv.seek(time);
+            videoElement.play();
+        }
 
         //Plays the video, will use the seek() method 
         //if start time isn't 0
@@ -114,7 +119,11 @@ function SpektralVideo(container, instanceID, params) {
         //At this moment, I'm not sure
         //if possible
 
-        videoElement.currentTime = time;
+        if (time > sv.getTotalTime) {
+            videoElement.currentTime = sv.getTotalTime;
+        } else {
+            videoElement.currentTime = time;
+        }
         sv.log("seek time: " + videoElement.currentTime);
     }
 
@@ -168,7 +177,6 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.mute = function () {
         videoElement.muted = true;
-        sv.log("mute: current vol: " + videoElement.volume);
     }
 
     ///////////////////////
@@ -176,7 +184,6 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.unmute = function () {
         videoElement.muted = false;
-        sv.log("unmute: current vol: " + videoElement.volume);
     }
 
     ///////////////////////
@@ -238,6 +245,7 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.getCurrentTime = function () {
         //Returns time in seconds
+        return videoElement.currentTime;
     }
 
     //////////////////////
@@ -245,6 +253,7 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.getTotalTime = function () {
         //Returns time in seconds
+        return videoElement.duration;
     }
 
     //////////////////////
@@ -357,13 +366,9 @@ function SpektralVideo(container, instanceID, params) {
 
         videoElement = document.createElement("video");
         createSetAttribute(videoElement, "id", elID);
-
         attachEventListener(videoElement, "loadedmetadata", onLoadedMetaData);
-
         //Add video element to container
         container.appendChild(videoElement);
-        //setBrowserWarning();
-        //sv.log("createVideoElement!! container: " + container + " videoElement: " + videoElement);
     }
 
     ///////////////////////
@@ -372,10 +377,8 @@ function SpektralVideo(container, instanceID, params) {
     function createSourceElement(source, type) {
 
         var sourceElem = document.createElement("source");
-
         createSetAttribute(sourceElem, "src", source);
         createSetAttribute(sourceElem, "type", "video/" + type);
-
         videoElement.appendChild(sourceElem);
     }
 
@@ -415,7 +418,6 @@ function SpektralVideo(container, instanceID, params) {
     function setBrowserWarning(message) {
 
         message = message || "Your browser does not support HTML5 video. Please upgrade your browser."
-
         videoElement.innerHTML = message;
     }
 
@@ -521,10 +523,7 @@ function SpektralVideo(container, instanceID, params) {
     ////INIT VIDEO
     //////////////////////
     function initVideo() {
-        //Will create the video upon the creation of a new video
-        sv.log("INIT VIDEO");
         createVideoElement(instanceID);
-
         if (autoplay === true) {
             sv.play();
         } 

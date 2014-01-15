@@ -13,7 +13,9 @@
         unmuteButton = document.getElementById("unmuteButton"),
         toggleMute = document.getElementById("toggleMuteButton"),
         volField = document.getElementById("volumeField"),
-        volumeButton = document.getElementById("volumeButton");
+        volumeButton = document.getElementById("volumeButton"),
+        seekField = document.getElementById("seekField"),
+        seekButton = document.getElementById("seekButton");
 
     ////////////////
     ////EVENT LISTENERS
@@ -25,10 +27,13 @@
     attachEventListener(muteButton, "click", onButtonClick);
     attachEventListener(unmuteButton, "click", onButtonClick);
     attachEventListener(toggleMuteButton, "click", onButtonClick);
-    attachEventListener(volumeButton, "click", onButtonClick)
+    attachEventListener(volumeButton, "click", onButtonClick);
+    attachEventListener(seekButton, "click", onButtonClick);
 
     function onButtonClick(evt) {
-        var name = evt.target.name, volLevel;
+        var
+            name = evt.target.name,
+            volLevel, seekTime;
 
         if(name === "play") {
             theVideo.play();
@@ -45,14 +50,17 @@
         } else if (name === "toggleMute") {
             theVideo.toggleMute();
         } else if (name === "volume") {
-            volLevel = volumeField.value;
+            volLevel = volField.value;
             if (volLevel !== "") {
                 if (volLevel > 100) {
                     volLevel = 100;
-                    volumeField.value = 100;
+                    volField.value = 100;
                 }
                 theVideo.setVolume(volLevel);
             }
+        } else if (name === "seek") {
+            seekTime = seekField.value;
+            theVideo.seek(seekTime);
         }
     }
 
