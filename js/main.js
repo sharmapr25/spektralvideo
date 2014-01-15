@@ -3,7 +3,7 @@
     var
         vidContainer = document.getElementById("mainContent"),
         vidPath = "video/bigbuckbunny/BigBuckBunny_320x180.mp4",
-        theVideo = new SpektralVideo(vidContainer, "theVideo", {"debug" : true}),
+        theVideo,
         controls = document.getElementById("controlsContainer"),
         playButton = document.getElementById("playButton"),
         pauseButton = document.getElementById("pauseButton"),
@@ -15,7 +15,12 @@
         volField = document.getElementById("volumeField"),
         volumeButton = document.getElementById("volumeButton"),
         seekField = document.getElementById("seekField"),
-        seekButton = document.getElementById("seekButton");
+        seekButton = document.getElementById("seekButton"),
+        speedField = document.getElementById("speedField"),
+        speedButton = document.getElementById("speedButton"),
+        ffButton = document.getElementById("ffButton");
+
+    theVideo = new SpektralVideo(vidContainer, "theVideo", {"debug" : true});
 
     ////////////////
     ////EVENT LISTENERS
@@ -29,11 +34,13 @@
     attachEventListener(toggleMuteButton, "click", onButtonClick);
     attachEventListener(volumeButton, "click", onButtonClick);
     attachEventListener(seekButton, "click", onButtonClick);
+    attachEventListener(speedButton, "click", onButtonClick);
+    attachEventListener(ffButton, "click", onButtonClick);
 
     function onButtonClick(evt) {
         var
             name = evt.target.name,
-            volLevel, seekTime;
+            volLevel, seekTime, pbSpeed;
 
         if(name === "play") {
             theVideo.play();
@@ -49,7 +56,7 @@
             theVideo.unmute();
         } else if (name === "toggleMute") {
             theVideo.toggleMute();
-        } else if (name === "volume") {
+        } else if (name === "setVolume") {
             volLevel = volField.value;
             if (volLevel !== "") {
                 if (volLevel > 100) {
@@ -61,6 +68,11 @@
         } else if (name === "seek") {
             seekTime = seekField.value;
             theVideo.seek(seekTime);
+        } else if (name === "playbackSpeed") {
+            pbSpeed = speedField.value;
+            theVideo.playbackSpeed(pbSpeed);
+        } else if (name === "fastForward") {
+            theVideo.fastForward();
         }
     }
 

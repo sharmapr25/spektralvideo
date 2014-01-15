@@ -7,7 +7,8 @@ function SpektralVideo(container, instanceID, params) {
     var 
         sv = this,
         container, path, width, height, autoplay, useDefaultControls,
-        debug = false, strictError = false, videoElement;
+        debug = false, strictError = false, videoElement, 
+        ffArray = [1, 2, 4, 8, 16, 32, 64], ffIndex = 0;
 
     ///////////////////////
     ////LOAD FILE
@@ -62,8 +63,6 @@ function SpektralVideo(container, instanceID, params) {
     ////PAUSE
     //////////////////////
     sv.pause = function () {
-        //Pauses the video,
-        //If video is already paused - does nothing
         videoElement.pause();
     }
 
@@ -71,8 +70,6 @@ function SpektralVideo(container, instanceID, params) {
     ////TOGGLE PAUSE
     //////////////////////
     sv.togglePause = function () {
-        //Pauses and unpauses the video
-        //depending on its current state
         if (videoElement.paused === false) {
             sv.pause();
         } else {
@@ -85,6 +82,8 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.stop = function (stopDownload) {
         //Stops video playback
+        //if stopDownload is set to
+        //true, unloads video
         stopDownload = stopDownload || false;
 
         if (stopDownload === false) {
@@ -143,9 +142,18 @@ function SpektralVideo(container, instanceID, params) {
     ///////////////////////
     ////FAST FORWARD
     //////////////////////
-    sv.fastForward = function (speed) {
+    sv.fastForward = function () {
 
-        speed = speed || 1;
+        //will have to determine current playback speed 
+        //and set the next ff step to closest speed
+        ffIndex ++;
+        if(ffIndex >= 6) {
+            ffIndex = 6;
+        }
+
+        videoElement.playbackRate = ffArray[ffIndex];
+
+        sv.log("fastForward: " + ffArray[ffIndex]);
 
         //Fast forwards the video
         //speed indicates how many 
@@ -159,6 +167,9 @@ function SpektralVideo(container, instanceID, params) {
     sv.playbackSpeed = function (speed) {
 
         speed = speed || 1;
+        videoElement.playbackRate = speed;
+
+        sv.log("playbackSpeed: " + speed);
 
         //The speed you want to playback at
         //Not sure if possible
@@ -527,6 +538,11 @@ function SpektralVideo(container, instanceID, params) {
         if (autoplay === true) {
             sv.play();
         } 
+
+        //currently is being set larger than it should be
+        if(useDefaultControls === true) {
+            createSetAttribute(videoElement, "controls");
+        }
     }
     //console.log("SpektralVideo: " + JSON.stringify(this));
 };
