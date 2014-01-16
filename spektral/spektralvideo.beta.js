@@ -7,7 +7,8 @@ function SpektralVideo(container, instanceID, params) {
     var 
         sv = this,
         container, path, width, height, autoplay, useDefaultControls,
-        debug = false, strictError = false, videoElement, currentPlaybackSpeed = 1;
+        debug = false, strictError = false, videoElement, currentPlaybackSpeed = 1,
+        rewindTimer, rewindTimerStarted = false,  rewindRate = 0;
     ///////////////////////
     ////LOAD FILE
     //////////////////////
@@ -44,6 +45,9 @@ function SpektralVideo(container, instanceID, params) {
     sv.play = function (time) {
 
         time = time || 0;
+
+        currentPlaybackSpeed = 1;
+        sv.playbackSpeed(currentPlaybackSpeed);
 
         if (time === 0) {
             videoElement.play();
@@ -118,10 +122,12 @@ function SpektralVideo(container, instanceID, params) {
 
         if (time > sv.getTotalTime) {
             videoElement.currentTime = sv.getTotalTime;
-        } else {
+        } else if (time <= 0)
+        	videoElement.currentTime = 0;
+        else {
             videoElement.currentTime = time;
         }
-        sv.log("seek time: " + videoElement.currentTime);
+        //sv.log("seek time: " + videoElement.currentTime);
     }
 
     ///////////////////////
@@ -129,12 +135,33 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.rewind = function (speed) {
 
-        speed = speed || 1;
+        speed = speed;
 
-        //Rewinds the video
-        //speed indicates how many 
-        //times faster to rewind
-        //Not sure if possible
+        if(speed !== undefined) {
+        	rewindRate = speed;
+        }
+
+        var newCurrentTime;
+
+        if(rewindTimerStarted === false) {
+        	rewindTimerStarted = true;
+        	rewindTimer = createTimer(0.025, stepBack);
+        	sv.log("rewind timer created!!!")
+        }
+
+        rewindRate = rewindRate += 0.05;
+
+        function stepBack(evt) {
+        	newCurrentTime = (sv.getCurrentTime() - rewindRate);
+        	if (newCurrentTime <= 0) {
+        		clearTimer(rewindTimer);
+        		newCurrentTime = 0;
+        		rewindTimerStarted = false;
+        	}
+        	sv.seek(newCurrentTime);
+	    }
+	    sv.log("rewindRate: " + rewindRate);
+        sv.log("rewind");
     }
 
     ///////////////////////
@@ -348,6 +375,9 @@ function SpektralVideo(container, instanceID, params) {
     //     sv.log("container is not set.", "warn");
     // }
 
+    //Other possible params
+    //isMuted, speed, startTime
+
     if(params === undefined) {
         //No param set, set defaults
         path = "none";
@@ -544,6 +574,38 @@ function SpektralVideo(container, instanceID, params) {
     function triggerEvent(obj, evt) {
         obj.dispatchEvent(evt);
     }
+
+    ////////////////////
+    ////CREATE TIMER
+    ////////////////////
+    function createTimer(time, handler) {
+
+        var convertedTime = time * 1000;
+        return setInterval(handler, convertedTime);
+    };
+
+    ////////////////////
+    ////CLEAR TIMER
+    ////////////////////
+    function clearTimer(timer) {
+        clearInterval(timer);
+    };
+
+    ////////////////////
+    ////CREATE TIME OUT
+    ////////////////////
+    function createTimeout(time, handler) {
+
+        var convertedTime = time * 1000;
+        setTimeout(handler, convertedTime);
+    };
+
+    ////////////////////
+    ////STOP TIME OUT
+    ////////////////////
+    function stopTimeout (timeout) {
+        clearTimeout(timeout);
+    };
 
     //INITIALIZE THE VIDEO**************************************************************
     initVideo();
