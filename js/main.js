@@ -76,7 +76,7 @@
         } else if (name === "fastForward") {
             theVideo.fastForward();
         } else if (name === "rewind") {
-            theVideo.rewind();
+            theVideo.rewind(true);
         }
     }
 

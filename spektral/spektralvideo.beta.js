@@ -8,6 +8,7 @@ function SpektralVideo(container, instanceID, params) {
         sv = this,
         container, path, width, height, autoplay, useDefaultControls,
         debug = false, strictError = false, videoElement, currentPlaybackSpeed = 1,
+ 		playerState = "stopped", muteState = "unmuted",
         rewindTimer, rewindTimerStarted = false,  rewindRate = 0;
     ///////////////////////
     ////LOAD FILE
@@ -46,8 +47,21 @@ function SpektralVideo(container, instanceID, params) {
 
         time = time || 0;
 
-        currentPlaybackSpeed = 1;
-        sv.playbackSpeed(currentPlaybackSpeed);
+        sv.log("play: muteState" + muteState);
+
+        if(muteState === "muted") {
+        	sv.mute();
+        } else {
+        	sv.unmute();
+        }
+
+        sv.playbackSpeed(1);
+
+        if(playerState === "rewinding") {
+        	clearTimer(rewindTimer);
+        	rewindTimerStarted = false;
+        	sv.log("play: clearTimer")
+        }
 
         if (time === 0) {
             videoElement.play();
@@ -55,6 +69,8 @@ function SpektralVideo(container, instanceID, params) {
             sv.seek(time);
             videoElement.play();
         }
+
+        playerState = "playing";
 
         //Plays the video, will use the seek() method 
         //if start time isn't 0
@@ -66,6 +82,7 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.pause = function () {
         videoElement.pause();
+        playerState = "paused";
     }
 
     ///////////////////////
@@ -94,6 +111,7 @@ function SpektralVideo(container, instanceID, params) {
         } else {
             sv.unloadVideo();
         }
+        playerState = "stopped";
     }
 
     ///////////////////////
@@ -127,19 +145,31 @@ function SpektralVideo(container, instanceID, params) {
         else {
             videoElement.currentTime = time;
         }
+        playerState = "seeking";
         //sv.log("seek time: " + videoElement.currentTime);
     }
 
     ///////////////////////
     ////REWIND
     //////////////////////
-    sv.rewind = function (speed) {
+    sv.rewind = function (muteSound, speed) {
 
+    	//TODO
+    	//Param - mute = false;	
+    	//if set to true, will mute video,
+    	//while rewinding then unmute when playing
+    	muteSound = muteSound || false;
         speed = speed;
+
+        if(muteSound === true) {
+        	videoElement.muted = true;
+        }
 
         if(speed !== undefined) {
         	rewindRate = speed;
         }
+
+        sv.playbackSpeed(1);
 
         var newCurrentTime;
 
@@ -158,10 +188,13 @@ function SpektralVideo(container, instanceID, params) {
         		newCurrentTime = 0;
         		rewindTimerStarted = false;
         	}
-        	sv.seek(newCurrentTime);
+        	if (newCurrentTime <= 0)
+	        	videoElement.currentTime = 0;
+	        else {
+	            videoElement.currentTime = newCurrentTime;
+	        }
 	    }
-	    sv.log("rewindRate: " + rewindRate);
-        sv.log("rewind");
+	    playerState = "rewinding";
     }
 
     ///////////////////////
@@ -170,6 +203,13 @@ function SpektralVideo(container, instanceID, params) {
     sv.fastForward = function () {
 
         //sv.log("fastForward: currentPlaybackSpeed in: " + currentPlaybackSpeed);
+
+        if(playerState === "rewinding") {
+        	clearTimer(rewindTimer);
+        	rewindTimerStarted = false;
+        	sv.log("fastForwarding: clearTimer")
+        }
+
         var newSpeed = 0;
 
         //Possible speeds: 2, 4, 8, 16, 32, 64, 128
@@ -204,7 +244,9 @@ function SpektralVideo(container, instanceID, params) {
         }
         currentPlaybackSpeed = newSpeed;
         sv.playbackSpeed(currentPlaybackSpeed);
-        //videoElement.playbackRate = currentPlaybackSpeed;
+
+        playerState = "fastForwarding";
+
         sv.log("fastForward: currentPlaybackSpeed: out: " + currentPlaybackSpeed);
     } 
 
@@ -233,6 +275,7 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.mute = function () {
         videoElement.muted = true;
+        muteState = "muted";
     }
 
     ///////////////////////
@@ -240,6 +283,7 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.unmute = function () {
         videoElement.muted = false;
+        muteState = "unmuted";
     }
 
     ///////////////////////
