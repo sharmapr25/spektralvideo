@@ -21,7 +21,8 @@
         speedButton = document.getElementById("speedButton"),
         resetPBButton = document.getElementById("resetPBButton"),
         ffButton = document.getElementById("ffButton"),
-        rewindButton = document.getElementById("rewindButton");
+        rewindButton = document.getElementById("rewindButton"),
+        loopButton = document.getElementById("loopButton");
 
     //Object containing multiple formats of the same video
     vidPathObj = {
@@ -47,6 +48,7 @@
     attachEventListener(resetPBButton, "click", onButtonClick);
     attachEventListener(ffButton, "click", onButtonClick);
     attachEventListener(rewindButton, "click", onButtonClick);
+    attachEventListener(loopButton, "click", onButtonClick);
 
     //To clear fields on focus
     attachEventListener(volField, "click", onFieldFocus);
@@ -58,7 +60,7 @@
     /////////////////
     function onButtonClick(evt) {
         var
-            name = evt.target.name,
+            target = evt.target, name = evt.target.name,
             volLevel, seekTime, pbSpeed;
 
         if(name === "play") {
@@ -97,6 +99,14 @@
             theVideo.fastForward();
         } else if (name === "rewind") {
             theVideo.rewind(true);
+        } else if (name === "loop") {
+            theVideo.loop();
+            target.name = "unloop";
+            target.value = "unloop";
+        } else if (name === "unloop") {
+            theVideo.loop(true);
+            target.name = "loop";
+            target.value = "loop";
         }
     }
 

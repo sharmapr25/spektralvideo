@@ -67,6 +67,7 @@ function SpektralVideo(container, instanceID, params) {
     	//regularSpeed determines if when play
     	//is invoked, whether the playBackSpeed
     	//should be restored to 1
+    	sv.log("playParams.regularSpeed: " + playParams.regularSpeed);
     	var regularSpeed = playParams.regularSpeed,
         time = playParams.time || 0, playTimer;
 
@@ -112,6 +113,8 @@ function SpektralVideo(container, instanceID, params) {
         		sv.log("CAN PLAY: Video wasn't ready.")
         	}
         }
+
+        sv.log("play: totalTime: " + sv.getTotalTime());
 
         playbackState = "playing";
 
@@ -297,6 +300,22 @@ function SpektralVideo(container, instanceID, params) {
         speed = speed || 1;
         currentPlaybackSpeed = speed;
         videoElement.playbackRate = currentPlaybackSpeed;
+    }
+
+    ///////////////////////
+    ////LOOP
+    //////////////////////
+    sv.loop = function (cancelLoop) {
+
+    	cancelLoop = cancelLoop || false;
+
+    	sv.log("loopVideo: cancelLoop: " + cancelLoop);
+
+    	if(cancelLoop === false) {
+    		videoElement.loop = false;
+    	} else {
+    		videoElement.loop = true;
+    	}
     }
 
     ///////////////////////
