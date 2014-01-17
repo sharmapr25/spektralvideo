@@ -80,7 +80,7 @@
         }
     }
 
-    theVideo.loadFile(vidPath);
+    theVideo.loadFile(vidPath, false);
 
     theVideo.insertBefore(controls);
 

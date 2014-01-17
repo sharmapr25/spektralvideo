@@ -6,7 +6,7 @@ function SpektralVideo(container, instanceID, params) {
     //Private Vars
     var 
         sv = this,
-        container, path, width, height, autoplay, useDefaultControls,
+        container, path, width, height, useDefaultControls, isMuted,
         debug = false, strictError = false, videoElement, currentPlaybackSpeed = 1,
  		playerState = "stopped", muteState = "unmuted",
         rewindTimer, rewindTimerStarted = false,  rewindRate = 0;
@@ -20,7 +20,7 @@ function SpektralVideo(container, instanceID, params) {
 
         var 
             pathType = getType(newPath),
-            videoType;
+            videoType, playTimer;
 
         if (pathType === "string") {
             //single path
@@ -30,6 +30,23 @@ function SpektralVideo(container, instanceID, params) {
         } else {
             //object, multiple formats
         }
+
+ 		sv.log("loadFile: autoplay: " + autoplay)
+        if (autoplay === true) {
+        	videoElement.autoplay = true;
+        	videoElement.load();
+        	if (sv.getReadyState() === "noInfo") {
+        		playTimer = createTimer(0.25, waitForData);
+        	}
+        	sv.log("AUTOPLAY: READY STATE: " + sv.getReadyState());
+        }
+
+        function waitForData() {
+        	if (sv.getReadyState() === "haveEnough") {
+        		clearTimer(playTimer);
+        		sv.play();
+        	}
+    	}
 
         sv.log("loadFile: path: " + pathType);
 
@@ -45,9 +62,9 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.play = function (time) {
 
-        time = time || 0;
+    	sv.log("PLAYING!!!!!!!!!!")
 
-        sv.log("play: muteState" + muteState);
+        time = time || 0;
 
         if(muteState === "muted") {
         	sv.mute();
@@ -154,10 +171,6 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.rewind = function (muteSound, speed) {
 
-    	//TODO
-    	//Param - mute = false;	
-    	//if set to true, will mute video,
-    	//while rewinding then unmute when playing
     	muteSound = muteSound || false;
         speed = speed;
 
@@ -202,8 +215,6 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.fastForward = function () {
 
-        //sv.log("fastForward: currentPlaybackSpeed in: " + currentPlaybackSpeed);
-
         if(playerState === "rewinding") {
         	clearTimer(rewindTimer);
         	rewindTimerStarted = false;
@@ -211,8 +222,6 @@ function SpektralVideo(container, instanceID, params) {
         }
 
         var newSpeed = 0;
-
-        //Possible speeds: 2, 4, 8, 16, 32, 64, 128
         //Determine what the next speed will be
         if (currentPlaybackSpeed < 2) {
             newSpeed = 2;
@@ -366,6 +375,36 @@ function SpektralVideo(container, instanceID, params) {
         //milliseconds if possible
     }
 
+    //////////////////////
+    ////GET READY STATE
+    //////////////////////
+    sv.getReadyState = function () {
+    	var state = videoElement.readyState, stateMessage = "";
+    	if (state === 0) {
+    		//No information whether or not the audio/video is ready
+    		stateMessage = "noInfo";
+    	} else if (state === 1) {	
+    		//Metadata for the audio/video is ready
+    		stateMessage = "haveMeta";
+    	} else if (state === 2) {
+    		//Data for the current playback position is available, 
+    		//but not enough data to play next frame/millisecond 
+    		stateMessage = "haveCurrent";
+    	} else if (state === 3) {
+    		//Data for the current and at least the next frame is available
+    		stateMessage = "haveFuture";
+    	} else if (state === 4) {	
+    		//Enough data available to start playing
+    		stateMessage = "haveEnough";
+    	} else {
+    		//Couldn't retrieve the readyState
+    		//videoElement might not be defined
+    		//or readyState is not available
+    		stateMessage = "noState";
+    	}
+    	return stateMessage;
+    }
+
     //////////////////
     ////INSERT AFTER
     //////////////////
@@ -388,7 +427,6 @@ function SpektralVideo(container, instanceID, params) {
     sv.log = function (message, method, obj) {
 
         method = method || "log";
-
         var err, ID = "SpektralVideo: " + instanceID + ": ";
 
         if (debug) {
@@ -427,23 +465,23 @@ function SpektralVideo(container, instanceID, params) {
         path = "none";
         width = 640;
         height = 320;
-        autoplay = false;
         useDefaultControls = false;
+        isMuted = false;
     } else {
         debug = params.debug || false;
         path = params.path || "none";
-        width = params.width;//Going to see if I can get the videos native width, instead of 640
+        width = params.width;
         height = params.height;
-        autoplay = params.autoplay || false;
         useDefaultControls = params.useDefaultControls || false;
+        isMuted = params.muted || false;
     }
 
-    sv.log("setParams: debug: " + debug + 
+    sv.log("params: debug: " + debug + 
             " path: " + path + 
             " width: " + width + 
             " height: " + height + 
-            " autoplay: " + autoplay + 
-            " useDefaultControls: " + useDefaultControls);
+            " useDefaultControls: " + useDefaultControls + 
+            "isMuted: " + isMuted);
 
     //Path
     //If no path is defined, then wait for loadVideo()
@@ -457,8 +495,6 @@ function SpektralVideo(container, instanceID, params) {
 
     //height - default: 320
     //height = params.height || 320;
-
-    //autoplay = params.autoplay || false;
 
     //useDefaultControls = params.useDefaultControls || false;
 
@@ -659,14 +695,16 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     function initVideo() {
         createVideoElement(instanceID);
-        if (autoplay === true) {
-            sv.play();
-        } 
 
+        //Controls
         //currently is being set larger than it should be
-        if(useDefaultControls === true) {
+        if (useDefaultControls === true) {
             createSetAttribute(videoElement, "controls");
         }
+
+        if (isMuted === true) {
+        	sv.mute();
+        } 
     }
     //console.log("SpektralVideo: " + JSON.stringify(this));
 };
