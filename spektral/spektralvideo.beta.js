@@ -20,30 +20,32 @@ function SpektralVideo(container, instanceID, params) {
 
         var 
             pathType = getType(newPath),
-            videoType, playTimer;
+            videoType, autoplayTimer, key;
 
         if (pathType === "string") {
             //single path
             videoType = getExtension(newPath);
             createSourceElement(newPath, videoType);
-            sv.log("loadFile: videoType: " + videoType);
         } else {
             //object, multiple formats
+            for (key in newPath) {
+            	videoType = getExtension(newPath[key]);
+            	createSourceElement(newPath[key], videoType);
+            }
         }
 
- 		sv.log("loadFile: autoplay: " + autoplay)
         if (autoplay === true) {
         	videoElement.autoplay = true;
         	videoElement.load();
         	if (sv.getReadyState() === "noInfo") {
-        		playTimer = createTimer(0.25, waitForData);
+        		autoplayTimer = createTimer(0.25, waitForData);
         	}
         	sv.log("AUTOPLAY: READY STATE: " + sv.getReadyState());
         }
 
         function waitForData() {
         	if (sv.getReadyState() === "haveEnough") {
-        		clearTimer(playTimer);
+        		clearTimer(autoplayTimer);
         		sv.play();
         	}
     	}
@@ -60,11 +62,19 @@ function SpektralVideo(container, instanceID, params) {
     ///////////////////////
     ////PLAY
     //////////////////////
-    sv.play = function (time) {
+    sv.play = function (playParams) {
 
-    	sv.log("PLAYING!!!!!!!!!!")
+    	//regularSpeed determines if when play
+    	//is invoked, whether the playBackSpeed
+    	//should be restored to 1
+    	var regularSpeed = playParams.regularSpeed,
+        time = playParams.time || 0, playTimer;
 
-        time = time || 0;
+        if (regularSpeed === undefined) {
+        	regularSpeed = true;
+        }
+
+        sv.log("play: regularSpeed: " + regularSpeed + " time: " + time);
 
         if(muteState === "muted") {
         	sv.mute();
@@ -72,7 +82,11 @@ function SpektralVideo(container, instanceID, params) {
         	sv.unmute();
         }
 
-        sv.playbackSpeed(1);
+        if (playerState === "fastForwarding" || playerState === "rewinding" || regularSpeed === true) {
+        	sv.log("playerState: " + playerState);
+        	sv.log("regularSpeed: " + regularSpeed);
+        	sv.playbackSpeed(1);
+        }
 
         if(playerState === "rewinding") {
         	clearTimer(rewindTimer);
@@ -87,6 +101,18 @@ function SpektralVideo(container, instanceID, params) {
             videoElement.play();
         }
 
+        if (sv.getReadyState() === "noInfo") {
+        	playTimer = createTimer(0.25, canPlay);
+        }
+
+        function canPlay() {
+        	if (sv.getReadyState() === "haveEnough") {
+        		clearTimer(playTimer);
+        		sv.play();
+        		sv.log("CAN PLAY: Video wasn't ready.")
+        	}
+        }
+
         playerState = "playing";
 
         //Plays the video, will use the seek() method 
@@ -98,6 +124,12 @@ function SpektralVideo(container, instanceID, params) {
     ////PAUSE
     //////////////////////
     sv.pause = function () {
+
+    	if (playerState === "rewinding") {
+    		clearTimer(rewindTimer);
+    		rewindTimerStarted = false;
+    	}
+
         videoElement.pause();
         playerState = "paused";
     }
@@ -218,7 +250,6 @@ function SpektralVideo(container, instanceID, params) {
         if(playerState === "rewinding") {
         	clearTimer(rewindTimer);
         	rewindTimerStarted = false;
-        	sv.log("fastForwarding: clearTimer")
         }
 
         var newSpeed = 0;
@@ -249,14 +280,11 @@ function SpektralVideo(container, instanceID, params) {
             //sv.log("currentPlaybackSpeed >= 128 && currentPlaybackSpeed < 256")
         } else {
             newSpeed = currentPlaybackSpeed;
-            sv.log("fastForward: ELSE!!!");
         }
         currentPlaybackSpeed = newSpeed;
-        sv.playbackSpeed(currentPlaybackSpeed);
+        videoElement.playbackRate = currentPlaybackSpeed;
 
         playerState = "fastForwarding";
-
-        sv.log("fastForward: currentPlaybackSpeed: out: " + currentPlaybackSpeed);
     } 
 
     ///////////////////////
@@ -267,8 +295,6 @@ function SpektralVideo(container, instanceID, params) {
         speed = speed || 1;
         currentPlaybackSpeed = speed;
         videoElement.playbackRate = currentPlaybackSpeed;
-
-        sv.log("playbackSpeed: " + currentPlaybackSpeed);
     }
 
     ///////////////////////
@@ -403,6 +429,20 @@ function SpektralVideo(container, instanceID, params) {
     		stateMessage = "noState";
     	}
     	return stateMessage;
+    }
+
+    //////////////////////
+    ////GET CURRENT SOURCE
+    //////////////////////
+    sv.getCurrentSource = function () {
+    	return videoElement.currentSrc;
+    }
+
+    //////////////////////
+    ////GET CURRENT TYPE
+    //////////////////////
+    sv.getCurrentType = function () {
+    	return getExtension(videoElement.currentSrc);
     }
 
     //////////////////

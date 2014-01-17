@@ -3,6 +3,7 @@
     var
         vidContainer = document.getElementById("mainContent"),
         vidPath = "video/bigbuckbunny/BigBuckBunny_320x180.mp4",
+        vidPathObj,
         theVideo,
         controls = document.getElementById("controlsContainer"),
         playButton = document.getElementById("playButton"),
@@ -20,6 +21,12 @@
         speedButton = document.getElementById("speedButton"),
         ffButton = document.getElementById("ffButton"),
         rewindButton = document.getElementById("rewindButton");
+
+    //Object containing multiple formats of the same video
+    vidPathObj = {
+        "mp4" : "video/bigbuckbunny/BigBuckBunny_320x180.mp4",
+        "ogv" : "video/bigbuckbunny/BigBuckBunny_320x180.ogv",
+        "webm" : "video/bigbuckbunny/BigBuckBunny_320x180.webm"};
 
     theVideo = new SpektralVideo(vidContainer, "theVideo", {"debug" : true});
 
@@ -45,7 +52,7 @@
             volLevel, seekTime, pbSpeed;
 
         if(name === "play") {
-            theVideo.play();
+            theVideo.play({"regularSpeed" : false});
         } else if (name === "pause") {
             theVideo.pause();
         } else if (name === "togglePause") {
@@ -80,7 +87,11 @@
         }
     }
 
-    theVideo.loadFile(vidPath, false);
+    //Load just the mp4
+    //theVideo.loadFile(vidPath, false);
+
+    //Load multiple formats
+    theVideo.loadFile(vidPathObj);
 
     theVideo.insertBefore(controls);
 
