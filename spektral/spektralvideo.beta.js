@@ -8,7 +8,7 @@ function SpektralVideo(container, instanceID, params) {
         sv = this,
         container, path, width, height, useDefaultControls, isMuted,
         debug = false, strictError = false, videoElement, currentPlaybackSpeed = 1,
- 		playerState = "stopped", muteState = "unmuted",
+ 		playbackState = "stopped", muteState = "unmuted",
         rewindTimer, rewindTimerStarted = false,  rewindRate = 0;
     ///////////////////////
     ////LOAD FILE
@@ -82,13 +82,13 @@ function SpektralVideo(container, instanceID, params) {
         	sv.unmute();
         }
 
-        if (playerState === "fastForwarding" || playerState === "rewinding" || regularSpeed === true) {
-        	sv.log("playerState: " + playerState);
+        if (playbackState === "fastForwarding" || playbackState === "rewinding" || regularSpeed === true) {
+        	sv.log("playbackState: " + playbackState);
         	sv.log("regularSpeed: " + regularSpeed);
         	sv.playbackSpeed(1);
         }
 
-        if(playerState === "rewinding") {
+        if(playbackState === "rewinding") {
         	clearTimer(rewindTimer);
         	rewindTimerStarted = false;
         	sv.log("play: clearTimer")
@@ -113,7 +113,7 @@ function SpektralVideo(container, instanceID, params) {
         	}
         }
 
-        playerState = "playing";
+        playbackState = "playing";
 
         //Plays the video, will use the seek() method 
         //if start time isn't 0
@@ -125,13 +125,14 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.pause = function () {
 
-    	if (playerState === "rewinding") {
+    	if (playbackState === "rewinding") {
     		clearTimer(rewindTimer);
     		rewindTimerStarted = false;
     	}
 
         videoElement.pause();
-        playerState = "paused";
+        playbackState = "paused";
+    	
     }
 
     ///////////////////////
@@ -149,6 +150,7 @@ function SpektralVideo(container, instanceID, params) {
     ////STOP
     //////////////////////
     sv.stop = function (stopDownload) {
+
         //Stops video playback
         //if stopDownload is set to
         //true, unloads video
@@ -160,7 +162,7 @@ function SpektralVideo(container, instanceID, params) {
         } else {
             sv.unloadVideo();
         }
-        playerState = "stopped";
+        playbackState = "stopped";
     }
 
     ///////////////////////
@@ -194,7 +196,7 @@ function SpektralVideo(container, instanceID, params) {
         else {
             videoElement.currentTime = time;
         }
-        playerState = "seeking";
+        playbackState = "seeking";
         //sv.log("seek time: " + videoElement.currentTime);
     }
 
@@ -239,7 +241,7 @@ function SpektralVideo(container, instanceID, params) {
 	            videoElement.currentTime = newCurrentTime;
 	        }
 	    }
-	    playerState = "rewinding";
+	    playbackState = "rewinding";
     }
 
     ///////////////////////
@@ -247,7 +249,7 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.fastForward = function () {
 
-        if(playerState === "rewinding") {
+        if(playbackState === "rewinding") {
         	clearTimer(rewindTimer);
         	rewindTimerStarted = false;
         }
@@ -284,7 +286,7 @@ function SpektralVideo(container, instanceID, params) {
         currentPlaybackSpeed = newSpeed;
         videoElement.playbackRate = currentPlaybackSpeed;
 
-        playerState = "fastForwarding";
+        playbackState = "fastForwarding";
     } 
 
     ///////////////////////
@@ -327,9 +329,9 @@ function SpektralVideo(container, instanceID, params) {
     sv.toggleMute = function () {
         //Toggles the mute on and off
         if (videoElement.muted === true) {
-            videoElement.muted = false;
+            sv.unmute();
         } else {
-            videoElement.muted = true;
+            sv.mute();
         }
     }
 
@@ -405,7 +407,7 @@ function SpektralVideo(container, instanceID, params) {
     ////GET READY STATE
     //////////////////////
     sv.getReadyState = function () {
-    	var state = videoElement.readyState, stateMessage = "";
+    	var state = videoElement.readyState, stateMessage;
     	if (state === 0) {
     		//No information whether or not the audio/video is ready
     		stateMessage = "noInfo";
@@ -432,6 +434,28 @@ function SpektralVideo(container, instanceID, params) {
     }
 
     //////////////////////
+    ////GET NETWORK STATE
+    //////////////////////
+    sv.getNetworkState = function () {
+    	var netState = videoElement.networkState, stateMessage;
+
+    	if (newState === 0) {
+    		//Video has not yet been initialized
+    		stateMessage = "empty";
+    	} else if (netState === 1) {
+    		//Video is active and has selected a resource, but is not using the network
+    		stateMessage = "idle";
+    	} else if (netState === 2) {
+    		//Browser is downloading data
+    		stateMessage = "loading";
+    	} else if (netState === 3) {
+    		//Video source found
+    		stateMessage = "noSource";
+    	}
+    	return stateMessage;
+    }
+
+    //////////////////////
     ////GET CURRENT SOURCE
     //////////////////////
     sv.getCurrentSource = function () {
@@ -444,6 +468,14 @@ function SpektralVideo(container, instanceID, params) {
     sv.getCurrentType = function () {
     	return getExtension(videoElement.currentSrc);
     }
+
+    //////////////////////
+    ////GET PLAYBACK STATE
+    //////////////////////
+   	sv.getPlaybackState = function () {
+   		sv.log("playbackState: " + playbackState);
+   		return playbackState;
+   	}
 
     //////////////////
     ////INSERT AFTER

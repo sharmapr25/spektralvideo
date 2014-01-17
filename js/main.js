@@ -19,6 +19,7 @@
         seekButton = document.getElementById("seekButton"),
         speedField = document.getElementById("speedField"),
         speedButton = document.getElementById("speedButton"),
+        resetPBButton = document.getElementById("resetPBButton"),
         ffButton = document.getElementById("ffButton"),
         rewindButton = document.getElementById("rewindButton");
 
@@ -43,9 +44,18 @@
     attachEventListener(volumeButton, "click", onButtonClick);
     attachEventListener(seekButton, "click", onButtonClick);
     attachEventListener(speedButton, "click", onButtonClick);
+    attachEventListener(resetPBButton, "click", onButtonClick);
     attachEventListener(ffButton, "click", onButtonClick);
     attachEventListener(rewindButton, "click", onButtonClick);
 
+    //To clear fields on focus
+    attachEventListener(volField, "click", onFieldFocus);
+    attachEventListener(seekField, "click", onFieldFocus);
+    attachEventListener(speedField, "click", onFieldFocus);
+
+    /////////////////
+    ////ON BUTTON CLICK
+    /////////////////
     function onButtonClick(evt) {
         var
             name = evt.target.name,
@@ -80,6 +90,9 @@
         } else if (name === "playbackSpeed") {
             pbSpeed = speedField.value;
             theVideo.playbackSpeed(pbSpeed);
+        } else if (name === "resetPB") {
+            speedField.value = 1;
+            theVideo.playbackSpeed(1);
         } else if (name === "fastForward") {
             theVideo.fastForward();
         } else if (name === "rewind") {
@@ -87,12 +100,26 @@
         }
     }
 
+    /////////////////
+    ////ON FIELD FOCUS
+    /////////////////
+    function onFieldFocus(evt) {
+        evt.target.value = "";
+    }
+
+
+    /////////////////
+    ////LOAD THE VIDEO FILES
+    /////////////////
+
     //Load just the mp4
     //theVideo.loadFile(vidPath, false);
 
     //Load multiple formats
     theVideo.loadFile(vidPathObj);
 
+    //Make sure the video element appears
+    //before the controlsContainer
     theVideo.insertBefore(controls);
 
     //HELPERS
