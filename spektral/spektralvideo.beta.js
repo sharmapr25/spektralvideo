@@ -189,18 +189,7 @@ function SpektralVideo(container, instanceID, params) {
     ///////////////////////
     ////SEEK
     //////////////////////
-    sv.seek = function (time, scrub) {
-
-        scrub = scrub || false;
-
-        //time can be 
-
-        //Seeks to a time in the video
-        //Scrub determines if the video
-        //will be allowed to play as you 
-        //scrub the seek bar
-        //At this moment, I'm not sure
-        //if possible
+    sv.seek = function (time) {
 
         if (time > sv.getTotalTime) {
             videoElement.currentTime = sv.getTotalTime;
@@ -210,7 +199,6 @@ function SpektralVideo(container, instanceID, params) {
             videoElement.currentTime = time;
         }
         playbackState = "seeking";
-        //sv.log("seek time: " + videoElement.currentTime);
     }
 
     ///////////////////////

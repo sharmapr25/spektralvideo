@@ -1,3 +1,11 @@
+#mainHeader {
+  padding: 10px;
+}
+#mainHeader h1 {
+  position: relative;
+  margin: 0 auto;
+  width: 250px;
+}
 #mainContent {
   margin: 0;
   padding: 0;
@@ -13,6 +21,15 @@ video {
   position: relative;
   margin: 0 auto;
   padding: 10px;
-  width: 50%;
+  width: 505px;
   background-color: #d7d7d7;
+}
+#seekSlider {
+  margin: 10px;
+}
+#mainFooter small {
+  position: relative;
+  left: 50%;
+  margin: 0 0 0 -44px;
+  width: 88px;
 }

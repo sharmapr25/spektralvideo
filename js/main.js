@@ -1,10 +1,10 @@
-(function(){
+$(document).ready (function(){
 
     var
         vidContainer = document.getElementById("mainContent"),
         vidPath = "video/bigbuckbunny/BigBuckBunny_320x180.mp4",
-        vidPathObj,
-        theVideo,
+        vidPathObj,theVideo, totalTime, sliderTimer = false,
+        isDragging = false, sliderValue = 0, useScrub = false,
         controls = document.getElementById("controlsContainer"),
         playButton = document.getElementById("playButton"),
         pauseButton = document.getElementById("pauseButton"),
@@ -22,7 +22,9 @@
         resetPBButton = document.getElementById("resetPBButton"),
         ffButton = document.getElementById("ffButton"),
         rewindButton = document.getElementById("rewindButton"),
-        loopButton = document.getElementById("loopButton");
+        loopButton = document.getElementById("loopButton"),
+        seekSlider = $("#seekSlider"),
+        scrubButton = document.getElementById("scrubButton");
 
     //Object containing multiple formats of the same video
     vidPathObj = {
@@ -49,6 +51,7 @@
     attachEventListener(ffButton, "click", onButtonClick);
     attachEventListener(rewindButton, "click", onButtonClick);
     attachEventListener(loopButton, "click", onButtonClick);
+    attachEventListener(scrubButton, "click", onButtonClick);
 
     //To clear fields on focus
     attachEventListener(volField, "click", onFieldFocus);
@@ -60,17 +63,19 @@
     /////////////////
     function onButtonClick(evt) {
         var
-            target = evt.target, name = evt.target.name,
+            name = evt.target.name,
             volLevel, seekTime, pbSpeed;
 
         if(name === "play") {
             theVideo.play({"regularSpeed" : false});
+            setSliderValue();
         } else if (name === "pause") {
             theVideo.pause();
         } else if (name === "togglePause") {
             theVideo.togglePause();
         } else if (name === "stop") {
             theVideo.stop();
+            stopSliderTimer();
         } else if (name === "mute") {
             theVideo.mute();
         } else if (name === "unmute") {
@@ -101,6 +106,12 @@
             theVideo.rewind(true);
         } else if (name === "loop") {
             theVideo.loop();
+        } else if (name === "scrub") {
+            if (useScrub === false) {
+                useScrub = true;
+            } else {
+                useScrub = false;
+            }
         }
     }
 
@@ -125,6 +136,71 @@
     //Make sure the video element appears
     //before the controlsContainer
     theVideo.insertBefore(controls);
+
+    //////////////////
+    ////INITIALIZE SEEK SLIDER
+    /////////////////
+    seekSlider.slider({
+        range: "max",
+        min: 0,
+        max: 10,
+        value: 0
+    });
+
+    //Attach start/stop events for slider
+    seekSlider.on("slidestart", function(event, ui) { startSlide(event, ui)} );
+    seekSlider.on("slide", function(event, ui) { onSlide(event, ui)});
+    seekSlider.on("slidestop", function(event, ui) { stopSlide(event, ui)} );
+
+    function setSliderValue() {
+        totalTime = theVideo.getTotalTime();
+        seekSlider.slider("option", "max", totalTime);
+        var sliderMax = seekSlider.slider("option", "max");
+
+        //If sliderTimer hasn't bee started
+        if (sliderTimer === false) {
+            sliderTimer = setInterval(updateSlider, 250);
+        }
+
+        console.log("theVideo: totalTime: " + totalTime);
+        console.log("sliderMax: " + sliderMax);
+    }
+
+    function stopSliderTimer() {
+        clearInterval(sliderTimer);
+        sliderTimer = false;
+    }
+
+    function updateSlider() {
+
+        if (isDragging === false) {
+            seekSlider.slider( "value", theVideo.getCurrentTime());
+            sliderValue = seekSlider.slider("option", "value");
+            //console.log("slideVal: " + slideVal);
+        }
+    }
+
+    function startSlide(evt, ui) {
+        isDragging = true;
+    }
+
+    function onSlide() {
+
+        if (useScrub === true) {
+            sliderValue = seekSlider.slider("option", "value");
+            theVideo.seek(sliderValue);
+        }
+    }
+
+    function stopSlide(evt, ui) {
+
+        sliderValue = seekSlider.slider("option", "value");
+        theVideo.seek(sliderValue);
+        //seekSlider.slider( "value", theVideo.getCurrentTime());
+
+        isDragging = false;
+        console.log("stopSlide");
+    }
 
     //HELPERS
     //////////////////
