@@ -315,17 +315,14 @@ function SpektralVideo(container, instanceID, params) {
     ///////////////////////
     ////LOOP
     //////////////////////
-    sv.loop = function (cancelLoop) {
-
-    	cancelLoop = cancelLoop || false;
-
-    	sv.log("loopVideo: cancelLoop: " + cancelLoop);
-
-    	if(cancelLoop === false) {
-    		videoElement.loop = false;
-    	} else {
+    sv.loop = function () {
+    	//Toggles the video looping
+    	if (videoElement.loop === false) {
     		videoElement.loop = true;
+    	} else {
+    		videoElement.loop = false;
     	}
+    	sv.log("loop: " + videoElement.loop);
     }
 
     ///////////////////////
@@ -665,8 +662,6 @@ function SpektralVideo(container, instanceID, params) {
     ////PLAYBACK CHECKER
     //////////////////////
     function playbackChecker() {
-    	///sv.log("playbackChecker");
-    	//sv.log("newtworkState: " + sv.getNetworkState());
     	if (videoElement.ended === true && playbackState !== "stopped") {
     		triggerEvent(videoElement, playbackComplete);
     		playbackState = "stopped";
@@ -677,7 +672,8 @@ function SpektralVideo(container, instanceID, params) {
     ////ON PLAYBACK COMPLETE
     //////////////////////
     function onPlaybackComplete() {
-    	sv.log("Playback is complete!!!!!!")
+    	sv.log("Playback is complete!!!!!!");
+    	sv.log("Looping: " + videoElement.loop);
     }
 
     //UTILS

@@ -101,12 +101,6 @@
             theVideo.rewind(true);
         } else if (name === "loop") {
             theVideo.loop();
-            target.name = "unloop";
-            target.value = "unloop";
-        } else if (name === "unloop") {
-            theVideo.loop(true);
-            target.name = "loop";
-            target.value = "loop";
         }
     }
 
