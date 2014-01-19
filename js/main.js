@@ -7,8 +7,10 @@ $(document).ready (function(){
         runningTime = "", pbTimer = false,
         sliderTimer = false, isDragging = false,
         sliderValue = 0, useScrub = false,
+        playbackState = "stopped",
         controls = document.getElementById("controlsContainer"),
         timeDisplay = document.getElementById("timeDisplay"),
+        playbackStateDisplay = document.getElementById("playbackStateDisplay"),
         playButton = document.getElementById("playButton"),
         pauseButton = document.getElementById("pauseButton"),
         togglePauseButton = document.getElementById("togglePauseButton"),
@@ -70,18 +72,22 @@ $(document).ready (function(){
             volLevel, seekTime, pbSpeed;
 
         if(name === "play") {
-            theVideo.play({"regularSpeed" : false});
+            theVideo.play({"regularSpeed" : true});
             setSliderValue();
             startPBTimer();
+            getPlayState();
         } else if (name === "pause") {
             theVideo.pause();
+            getPlayState();
         } else if (name === "togglePause") {
             theVideo.togglePause();
+            getPlayState();
         } else if (name === "stop") {
             theVideo.stop();
             stopSliderTimer();
             stopPBTimer();
             timeDisplay.innerHTML = "0:00 / 0:00";
+            getPlayState();
         } else if (name === "mute") {
             theVideo.mute();
         } else if (name === "unmute") {
@@ -100,6 +106,7 @@ $(document).ready (function(){
         } else if (name === "seek") {
             seekTime = seekField.value;
             theVideo.seek(seekTime);
+            getPlayState();
         } else if (name === "playbackSpeed") {
             pbSpeed = speedField.value;
             theVideo.playbackSpeed(pbSpeed);
@@ -108,8 +115,10 @@ $(document).ready (function(){
             theVideo.playbackSpeed(1);
         } else if (name === "fastForward") {
             theVideo.fastForward();
+            getPlayState();
         } else if (name === "rewind") {
             theVideo.rewind(true);
+            getPlayState();
         } else if (name === "loop") {
             theVideo.loop();
         } else if (name === "scrub") {
@@ -217,6 +226,14 @@ $(document).ready (function(){
         runningTime = theVideo.getFormattedTime();
         timeDisplay.innerHTML = runningTime.currentAndTotal;
         //console.log("runningTime: " + runningTime.currentAndTotal);
+    }
+
+    ////////////////////
+    ////GET PLAY STATE
+    /////////////////////
+    function getPlayState() {
+        playbackState = theVideo.getPlaybackState();
+        playbackStateDisplay.innerHTML = playbackState;
     }
 
     //HELPERS

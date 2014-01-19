@@ -62,17 +62,14 @@ function SpektralVideo(container, instanceID, params) {
     	//regularSpeed determines if when play
     	//is invoked, whether the playBackSpeed
     	//should be restored to 1
-    	sv.log("playParams.regularSpeed: " + playParams.regularSpeed);
-    	var regularSpeed = playParams.regularSpeed,
-        time = playParams.time || 0, pTimer;
+    	var 
+    		rSpeed = getParameter(playParams, "regularSpeed", true);
+    		time = getParameter(playParams, "time", 0), 
+    		pTimer = false;
 
-        if (regularSpeed === undefined) {
-        	regularSpeed = true;
-        }
+        sv.log("play: regularSpeed: " + rSpeed + " time: " + time);
 
-        sv.log("play: regularSpeed: " + regularSpeed + " time: " + time);
-
-        sv.log("playbackTimer: " + playbackTimer);
+        //sv.log("playbackTimer: " + playbackTimer);
 
         if (playbackTimer === undefined || playbackTimer === false) {
         	//Start playbackTimer if it hasn't been started
@@ -85,9 +82,9 @@ function SpektralVideo(container, instanceID, params) {
         	sv.unmute();
         }
 
-        if (playbackState === "fastForwarding" || playbackState === "rewinding" || regularSpeed === true) {
+        if (playbackState === "fastForwarding" || playbackState === "rewinding" || rSpeed === true) {
         	sv.log("playbackState: " + playbackState);
-        	sv.log("regularSpeed: " + regularSpeed);
+        	sv.log("regularSpeed: " + rSpeed);
         	sv.playbackSpeed(1);
         }
 
@@ -116,7 +113,7 @@ function SpektralVideo(container, instanceID, params) {
         	}
         }
 
-        sv.log("play: totalTime: " + sv.getTotalTime());
+        //sv.log("play: totalTime: " + sv.getTotalTime());
 
         playbackState = "playing";
 
@@ -143,11 +140,11 @@ function SpektralVideo(container, instanceID, params) {
     ///////////////////////
     ////TOGGLE PAUSE
     //////////////////////
-    sv.togglePause = function () {
+    sv.togglePause = function (playParams) {
         if (videoElement.paused === false) {
             sv.pause();
         } else {
-            sv.play();
+            sv.play(playParams);
         }
     }
 
@@ -411,7 +408,6 @@ function SpektralVideo(container, instanceID, params) {
 
 	    if (seconds < 10) {
 	    	secondsString = "0" + secondsString;
-	    	sv.log("secondsString: " + secondsString);
 	    }    
 
 	    formattedTime["hours"] = hours.toString();
@@ -602,12 +598,12 @@ function SpektralVideo(container, instanceID, params) {
         useDefaultControls = false;
         isMuted = false;
     } else {
-        debug = params.debug || false;
-        path = params.path || "none";
+        debug = getParameter(params, "debug", false);
+        path = getParameter(params, "path", "none");
         width = params.width;
         height = params.height;
-        useDefaultControls = params.useDefaultControls || false;
-        isMuted = params.muted || false;
+        useDefaultControls = getParameter(params, "useDefaultControls", false);
+        isMuted = getParameter(params, "muted", false);
     }
 
     sv.log("params: debug: " + debug + 
@@ -814,14 +810,14 @@ function SpektralVideo(container, instanceID, params) {
 
         var convertedTime = time * 1000;
         return setInterval(handler, convertedTime);
-    };
+    }
 
     ////////////////////
     ////CLEAR TIMER
     ////////////////////
     function clearTimer(timer) {
         clearInterval(timer);
-    };
+    }
 
     ////////////////////
     ////CREATE TIME OUT
@@ -830,14 +826,34 @@ function SpektralVideo(container, instanceID, params) {
 
         var convertedTime = time * 1000;
         setTimeout(handler, convertedTime);
-    };
+    }
 
     ////////////////////
     ////STOP TIME OUT
     ////////////////////
     function stopTimeout (timeout) {
         clearTimeout(timeout);
-    };
+    }
+
+    ////////////////////
+    ////GET PARAMETER
+    ////////////////////
+    function getParameter (obj, param, defaultParam) {
+    	var retrievedParam;
+    	if (obj !== undefined) {
+	    	if (obj[param] === undefined) {
+	    		retrievedParam = defaultParam;
+	    		//sv.log("getParameter: " + param + " was not found, setting to default.")
+	    	} else {
+	    		retrievedParam = obj[param];
+	    		//sv.log("getParameter: " + param + " found.")
+	    	}
+	    } else {
+	    	retrievedParam = defaultParam;
+	    	//sv.log("getParameter: object was not defined, setting " + param + " to default.")
+	    }
+    	return retrievedParam;
+    }
 
     //INITIALIZE THE VIDEO**************************************************************
     initVideo();

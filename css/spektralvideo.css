@@ -21,8 +21,15 @@ video {
   padding: 0;
   width: 100%;
 }
+#outputContainer {
+  padding: 10px;
+  background-color: #8a8a8a;
+}
 #timeDisplay:before {
   content: "Time: ";
+}
+#playbackStateDisplay:before {
+  content: "Playback state: ";
 }
 #controlsContainer {
   position: relative;
