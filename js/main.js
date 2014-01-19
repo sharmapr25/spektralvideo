@@ -3,9 +3,12 @@ $(document).ready (function(){
     var
         vidContainer = document.getElementById("mainContent"),
         vidPath = "video/bigbuckbunny/BigBuckBunny_320x180.mp4",
-        vidPathObj,theVideo, totalTime, sliderTimer = false,
-        isDragging = false, sliderValue = 0, useScrub = false,
+        vidPathObj, theVideo, totalTime, elapsedTime, totalDuration,
+        runningTime = "", pbTimer = false,
+        sliderTimer = false, isDragging = false,
+        sliderValue = 0, useScrub = false,
         controls = document.getElementById("controlsContainer"),
+        timeDisplay = document.getElementById("timeDisplay"),
         playButton = document.getElementById("playButton"),
         pauseButton = document.getElementById("pauseButton"),
         togglePauseButton = document.getElementById("togglePauseButton"),
@@ -32,7 +35,7 @@ $(document).ready (function(){
         "ogv" : "video/bigbuckbunny/BigBuckBunny_320x180.ogv",
         "webm" : "video/bigbuckbunny/BigBuckBunny_320x180.webm"};
 
-    theVideo = new SpektralVideo(vidContainer, "theVideo", {"debug" : true});
+    theVideo = new SpektralVideo(vidContainer, "theVideo", {"debug" : true, "muted" : true});
 
     ////////////////
     ////EVENT LISTENERS
@@ -69,6 +72,7 @@ $(document).ready (function(){
         if(name === "play") {
             theVideo.play({"regularSpeed" : false});
             setSliderValue();
+            startPBTimer();
         } else if (name === "pause") {
             theVideo.pause();
         } else if (name === "togglePause") {
@@ -76,6 +80,7 @@ $(document).ready (function(){
         } else if (name === "stop") {
             theVideo.stop();
             stopSliderTimer();
+            stopPBTimer();
         } else if (name === "mute") {
             theVideo.mute();
         } else if (name === "unmute") {
@@ -194,6 +199,23 @@ $(document).ready (function(){
         theVideo.seek(sliderValue);
         isDragging = false;
         console.log("stopSlide");
+    }
+
+    ////////////////////
+    ////PLAY BACK TIMER
+    /////////////////////
+    function startPBTimer() {
+        pbTimer = setInterval(onPlayback, 250);
+    }
+
+    function stopPBTimer() {
+        clearInterval(pbTimer);
+    }
+
+    function onPlayback() {
+        runningTime = theVideo.getFormattedTime();
+        timeDisplay.innerHTML = runningTime;
+        console.log("runningTime: " + runningTime);
     }
 
     //HELPERS

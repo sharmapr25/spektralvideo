@@ -52,12 +52,6 @@ function SpektralVideo(container, instanceID, params) {
     	}
 
         sv.log("loadFile: path: " + pathType);
-
-        //Loads video and determines if it needs to autoplay 
-        //or preload a percentage of the video 
-        //Path can be either a string or an object
-        //If an object it will look something like this:
-        //{"mp4" : "video.mp4", "ogg" : "video.ogg", "webm" : "video.webm"}
     }
 
     ///////////////////////
@@ -406,11 +400,74 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     ////FORMAT TIME
     //////////////////////
-    sv.formatTime = function (time, format) {
-        //Possible formats
-        //minutes/seconds
-        //hours/minutes/seconds
-        //milliseconds if possible
+    sv.formatTime = function (time) {
+        var 
+        	formattedTime = {}, 
+	        hours = Math.floor(time / (60 * 60)), 
+	        minDivisor = time % (60 * 60)
+	        minutes = Math.floor(minDivisor / 60),
+	        seconds = Math.ceil(minDivisor % 60),
+	        secondsString = seconds.toString();
+
+	    if (seconds < 10) {
+	    	secondsString = "0" + secondsString;
+	    	sv.log("secondsString: " + secondsString);
+	    }    
+
+	    formattedTime["hours"] = hours.toString();
+	    formattedTime["minutes"] = minutes.toString();
+	    formattedTime["seconds"] = secondsString;
+	    return formattedTime;    
+    }
+
+    //////////////////////
+    ////GET FORMATTED TIME
+    //////////////////////
+    sv.getFormattedTime = function (showHour) {
+
+    	showHour = showHour;
+    	if (showHour === undefined) {
+    		showHour = false;
+    	}
+
+    	//I want to break up the formattedString,
+    	//separate it into an object containing 
+    	//currentTime and totalTime 
+
+    	var 
+    		formattedString = "",
+    		currentTimeObj = sv.formatTime(sv.getCurrentTime()),
+    		totalTimeObj = sv.formatTime(sv.getTotalTime()),
+    		currentHours = currentTimeObj.hours, 
+    		currentMinutes = currentTimeObj.minutes, 
+    		currentSeconds = currentTimeObj.seconds,
+    		totalHours = totalTimeObj.hours, 
+    		totalMinutes = totalTimeObj.minutes, 
+    		totalSeconds = totalTimeObj.seconds;
+
+    	if (showHour === true) {
+    		formattedString = currentHours + 
+    			":" + 
+    			currentMinutes + 
+    			":" + 
+    			currentSeconds +
+    			" / " + 
+    			totalHours + 
+    			":" + 
+    			totalMinutes + 
+    			":" + 
+    			totalSeconds;
+    	} else {
+    		formattedString = currentMinutes + 
+    			":" + 
+    			currentSeconds + 
+    			" / " +
+    			totalMinutes +
+    			":" +
+    			totalSeconds;
+
+    	}
+    	return formattedString;
     }
 
     //////////////////////
