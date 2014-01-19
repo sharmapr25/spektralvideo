@@ -417,25 +417,21 @@ function SpektralVideo(container, instanceID, params) {
 	    formattedTime["hours"] = hours.toString();
 	    formattedTime["minutes"] = minutes.toString();
 	    formattedTime["seconds"] = secondsString;
+
+	    formattedTime["hoursNum"] = hours;
+	    formattedTime["minutesNum"] = minutes;
+	    formattedTime["secondsNum"] = seconds;
+
 	    return formattedTime;    
     }
 
     //////////////////////
     ////GET FORMATTED TIME
     //////////////////////
-    sv.getFormattedTime = function (showHour) {
-
-    	showHour = showHour;
-    	if (showHour === undefined) {
-    		showHour = false;
-    	}
-
-    	//I want to break up the formattedString,
-    	//separate it into an object containing 
-    	//currentTime and totalTime 
+    sv.getFormattedTime = function () {
 
     	var 
-    		formattedString = "",
+    		formatTimeObj = {},
     		currentTimeObj = sv.formatTime(sv.getCurrentTime()),
     		totalTimeObj = sv.formatTime(sv.getTotalTime()),
     		currentHours = currentTimeObj.hours, 
@@ -445,29 +441,22 @@ function SpektralVideo(container, instanceID, params) {
     		totalMinutes = totalTimeObj.minutes, 
     		totalSeconds = totalTimeObj.seconds;
 
-    	if (showHour === true) {
-    		formattedString = currentHours + 
-    			":" + 
-    			currentMinutes + 
-    			":" + 
-    			currentSeconds +
-    			" / " + 
-    			totalHours + 
-    			":" + 
-    			totalMinutes + 
-    			":" + 
-    			totalSeconds;
-    	} else {
-    		formattedString = currentMinutes + 
-    			":" + 
-    			currentSeconds + 
-    			" / " +
-    			totalMinutes +
-    			":" +
-    			totalSeconds;
+    	//Minutes/Seconds
+    	formatTimeObj["current"] = currentMinutes + ":" + currentSeconds;
+    	formatTimeObj["total"] = totalMinutes + ":" + totalSeconds;
 
-    	}
-    	return formattedString;
+    	//Hours/Minutes/Seconds
+    	formatTimeObj["currentHMS"] = currentHours + ":" + currentMinutes + ":" + currentSeconds;
+    	formatTimeObj["totalHMS"] = totalHours + ":" + totalMinutes + ":" + totalSeconds;
+
+    	//Current + total minutes/Seconds
+    	formatTimeObj["currentAndTotal"] = currentMinutes + ":" + currentSeconds + " / " + totalMinutes + ":" + totalSeconds;
+
+    	//Current + total hours/minutes/seconds
+    	formatTimeObj["currentAndTotalHMS"] = currentHours + ":" + currentMinutes + ":" + currentSeconds + " / " +
+    	totalHours + ":" + totalMinutes + ":" + totalSeconds;
+
+    	return formatTimeObj;
     }
 
     //////////////////////

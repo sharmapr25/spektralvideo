@@ -81,6 +81,7 @@ $(document).ready (function(){
             theVideo.stop();
             stopSliderTimer();
             stopPBTimer();
+            timeDisplay.innerHTML = "0:00 / 0:00";
         } else if (name === "mute") {
             theVideo.mute();
         } else if (name === "unmute") {
@@ -166,9 +167,6 @@ $(document).ready (function(){
         if (sliderTimer === false) {
             sliderTimer = setInterval(updateSlider, 250);
         }
-
-        console.log("theVideo: totalTime: " + totalTime);
-        console.log("sliderMax: " + sliderMax);
     }
 
     function stopSliderTimer() {
@@ -205,17 +203,20 @@ $(document).ready (function(){
     ////PLAY BACK TIMER
     /////////////////////
     function startPBTimer() {
-        pbTimer = setInterval(onPlayback, 250);
+        if (pbTimer === false) {
+            pbTimer = setInterval(onPlayback, 250);
+        }
     }
 
     function stopPBTimer() {
         clearInterval(pbTimer);
+        pbTimer = false;
     }
 
     function onPlayback() {
         runningTime = theVideo.getFormattedTime();
-        timeDisplay.innerHTML = runningTime;
-        console.log("runningTime: " + runningTime);
+        timeDisplay.innerHTML = runningTime.currentAndTotal;
+        //console.log("runningTime: " + runningTime.currentAndTotal);
     }
 
     //HELPERS
