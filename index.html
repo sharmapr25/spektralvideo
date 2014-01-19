@@ -26,10 +26,13 @@
             <h1>Spektralvideo.js</h1>
         </header>
         <section id="mainContent">
+            <div id="videoContainer"></div>
             <div id="controlsContainer">
                 <div id="outputContainer">
                     <div id="timeDisplay">0:00 / 0:00</div>
-                    <div id="playbackStateDisplay">stopped</div>
+                    <div id="playbackDisplay">stopped</div>
+                    <div id="networkDisplay"></div>
+                    <div id="formatDisplay">NA</div>
                 </div>
                 <input id="playButton" name="play" type="button" value="play"/>
                 <input id="pauseButton" name= "pause" type="button" value="pause"/>
@@ -39,15 +42,15 @@
                 <input id="unmuteButton" name= "unmute" type="button" value="unmute"/>
                 <input id="toggleMuteButton" name= "toggleMute" type="button" value="toggle mute"/>
                 <form>
-                    Volume: <input id="volumeField" type="text" value="100">
+                    Volume: <input id="volumeField" class="inputFields" type="text" value="100">
                     <input id="volumeButton" name="setVolume" type="button" value="set volume">
                 </form>
                 <form>
-                    Seek: <input id="seekField" type="text" value="0">
+                    Seek: <input id="seekField" class="inputFields" type="text" value="0">
                     <input id="seekButton" name="seek" type="button" value="seek">
                 </form>
                 <form>
-                    Playback Speed: <input id="speedField" type="text" value="1">
+                    Playback Speed: <input id="speedField" class="inputFields" type="text" value="1">
                     <input id="speedButton" name="playbackSpeed" type="button" value="set playback speed">
                 </form>
                 <input id="resetPBButton" name= "resetPB" type="button" value="reset playback"/>

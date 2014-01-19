@@ -1,16 +1,18 @@
 $(document).ready (function(){
 
     var
-        vidContainer = document.getElementById("mainContent"),
+        vidContainer = document.getElementById("videoContainer"),
         vidPath = "video/bigbuckbunny/BigBuckBunny_320x180.mp4",
         vidPathObj, theVideo, totalTime, elapsedTime, totalDuration,
         runningTime = "", pbTimer = false,
         sliderTimer = false, isDragging = false,
         sliderValue = 0, useScrub = false,
-        playbackState = "stopped",
+        playbackState = "stopped", networkStatus, supportedFormat,
         controls = document.getElementById("controlsContainer"),
         timeDisplay = document.getElementById("timeDisplay"),
-        playbackStateDisplay = document.getElementById("playbackStateDisplay"),
+        playbackDisplay = document.getElementById("playbackDisplay"),
+        networkDisplay = document.getElementById("networkDisplay"),
+        formatDisplay = document.getElementById("formatDisplay"),
         playButton = document.getElementById("playButton"),
         pauseButton = document.getElementById("pauseButton"),
         togglePauseButton = document.getElementById("togglePauseButton"),
@@ -37,7 +39,7 @@ $(document).ready (function(){
         "ogv" : "video/bigbuckbunny/BigBuckBunny_320x180.ogv",
         "webm" : "video/bigbuckbunny/BigBuckBunny_320x180.webm"};
 
-    theVideo = new SpektralVideo(vidContainer, "theVideo", {"debug" : true, "muted" : true});
+    theVideo = new SpektralVideo(vidContainer, "theVideo", {"debug" : true, "muted" : true, "class" : "videoClass"});
 
     ////////////////
     ////EVENT LISTENERS
@@ -143,14 +145,16 @@ $(document).ready (function(){
     /////////////////
 
     //Load just the mp4
-    theVideo.loadFile(vidPath, false);
+    //theVideo.loadFile(vidPath, false);
 
     //Load multiple formats
-    //theVideo.loadFile(vidPathObj);
+    theVideo.loadFile(vidPathObj);
 
     //Make sure the video element appears
     //before the controlsContainer
-    theVideo.insertBefore(controls);
+    //This was when video was put into
+    //mainContent vs. videoContainer
+    //theVideo.insertBefore(controls);
 
     //////////////////
     ////INITIALIZE SEEK SLIDER
@@ -225,6 +229,9 @@ $(document).ready (function(){
     function onPlayback() {
         runningTime = theVideo.getFormattedTime();
         timeDisplay.innerHTML = runningTime.currentAndTotal;
+
+        networkStatus = theVideo.getNetworkState();
+        networkDisplay.innerHTML = networkStatus;
         //console.log("runningTime: " + runningTime.currentAndTotal);
     }
 
@@ -233,7 +240,10 @@ $(document).ready (function(){
     /////////////////////
     function getPlayState() {
         playbackState = theVideo.getPlaybackState();
-        playbackStateDisplay.innerHTML = playbackState;
+        playbackDisplay.innerHTML = playbackState;
+
+        supportedFormat = theVideo.getCurrentType();
+        formatDisplay.innerHTML = supportedFormat;
     }
 
     //HELPERS

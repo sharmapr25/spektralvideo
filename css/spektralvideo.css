@@ -15,11 +15,23 @@ body {
   padding: 0;
   height: auto;
 }
+#videoContainer {
+  position: relative;
+  margin: 20px 0;
+  padding: 0;
+  width: 100%;
+}
 video {
+  display: block;
   position: relative;
   margin: 0 auto;
   padding: 0;
-  width: 100%;
+}
+.videoClass {
+  border: 5px solid white;
+}
+.extraPadding {
+  padding: 20px;
 }
 #outputContainer {
   padding: 10px;
@@ -28,8 +40,14 @@ video {
 #timeDisplay:before {
   content: "Time: ";
 }
-#playbackStateDisplay:before {
+#playbackDisplay:before {
   content: "Playback state: ";
+}
+#networkDisplay:before {
+  content: "Network state: ";
+}
+#formatDisplay:before {
+  content: "Format used: ";
 }
 #controlsContainer {
   position: relative;
@@ -37,6 +55,10 @@ video {
   padding: 10px;
   width: 505px;
   background-color: #d7d7d7;
+}
+.inputFields {
+  width: 30px;
+  text-align: center;
 }
 #seekSlider {
   margin: 10px;

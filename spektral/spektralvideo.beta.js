@@ -6,7 +6,7 @@ function SpektralVideo(container, instanceID, params) {
     //Private Vars
     var 
         sv = this,
-        container, path, width, height, useDefaultControls, isMuted,
+        container, path, width, height, useDefaultControls, isMuted, videoClass,
         debug = false, strictError = false, videoElement, currentPlaybackSpeed = 1,
  		playbackState = "stopped", muteState = "unmuted",
         rewindTimer, rewindTimerStarted = false,  rewindRate = 0,
@@ -587,9 +587,8 @@ function SpektralVideo(container, instanceID, params) {
     //     sv.log("container is not set.", "warn");
     // }
 
-    //Other possible params
-    //isMuted, speed, startTime
-
+    //Other possible params for the future
+    //speed, startTime
     if(params === undefined) {
         //No param set, set defaults
         path = "none";
@@ -597,6 +596,7 @@ function SpektralVideo(container, instanceID, params) {
         height = 320;
         useDefaultControls = false;
         isMuted = false;
+        videoClass = false;
     } else {
         debug = getParameter(params, "debug", false);
         path = getParameter(params, "path", "none");
@@ -604,6 +604,7 @@ function SpektralVideo(container, instanceID, params) {
         height = params.height;
         useDefaultControls = getParameter(params, "useDefaultControls", false);
         isMuted = getParameter(params, "muted", false);
+        videoClass = getParameter(params, "class", false);
     }
 
     sv.log("params: debug: " + debug + 
@@ -611,22 +612,8 @@ function SpektralVideo(container, instanceID, params) {
             " width: " + width + 
             " height: " + height + 
             " useDefaultControls: " + useDefaultControls + 
-            "isMuted: " + isMuted);
-
-    //Path
-    //If no path is defined, then wait for loadVideo()
-    //Path can be a string or and object
-    //If an object it will look something like this:
-    //{"mp4" : "video.mp4", "ogg" : "video.ogg", "webm" : "video.webm"}
-    //path = params.path || "none";
-
-    //width - default: 640
-    //width = params.width || 640;
-
-    //height - default: 320
-    //height = params.height || 320;
-
-    //useDefaultControls = params.useDefaultControls || false;
+            "isMuted: " + isMuted +
+            "videoClass" + videoClass);
 
     ///////////////////////
     ////CREATE VIDEO ELEMENT
@@ -635,6 +622,13 @@ function SpektralVideo(container, instanceID, params) {
 
         videoElement = document.createElement("video");
         createSetAttribute(videoElement, "id", elID);
+        createSetAttribute(videoElement, "style", "visibility:hidden");
+
+        sv.log("createVideoElement: videoClass: " + videoClass);
+        if (videoClass !== false) {
+        	createSetAttribute(videoElement, "class", videoClass);
+        }
+
         attachEventListener(videoElement, "loadedmetadata", onLoadedMetaData);
         //Add video element to container
         container.appendChild(videoElement);
@@ -672,6 +666,8 @@ function SpektralVideo(container, instanceID, params) {
             //Set predefined height
             createSetAttribute(videoElement, "height", height);
         }
+
+        createSetAttribute(videoElement, "style", "visibility:visible");
     }
 
     ///////////////////////
