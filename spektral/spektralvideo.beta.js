@@ -10,7 +10,7 @@ function SpektralVideo(container, instanceID, params) {
         debug = false, strictError = false, videoElement, currentPlaybackSpeed = 1,
  		playbackState = "stopped", muteState = "unmuted",
         rewindTimer, rewindTimerStarted = false,  rewindRate = 0,
-        playbackTimer, playbackComplete;
+        playbackTimer, playbackComplete, possibleFormats;
     ///////////////////////
     ////LOAD FILE
     //////////////////////
@@ -161,10 +161,6 @@ function SpektralVideo(container, instanceID, params) {
     ////STOP
     //////////////////////
     sv.stop = function (stopDownload) {
-
-        //Stops video playback
-        //if stopDownload is set to
-        //true, unloads video
         stopDownload = stopDownload || false;
 
         if (stopDownload === false) {
@@ -410,7 +406,7 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     ////FORMAT TIME
     //////////////////////
-    sv.formatTime = function () {
+    sv.formatTime = function (time, format) {
         //Possible formats
         //minutes/seconds
         //hours/minutes/seconds
@@ -473,7 +469,13 @@ function SpektralVideo(container, instanceID, params) {
     ////GET CURRENT SOURCE
     //////////////////////
     sv.getCurrentSource = function () {
-    	return videoElement.currentSrc;
+    	var source = videoElement.currentSrc;
+
+    	if (source === undefined || source === "") {
+    		sv.log("No supported formats available!", "warn");
+    	}
+
+    	return source;
     }
 
     //////////////////////
@@ -798,6 +800,13 @@ function SpektralVideo(container, instanceID, params) {
     ////INIT VIDEO
     //////////////////////
     function initVideo() {
+
+    	possibleFormats = {
+    		"ogg" : "theora, vorbis",
+    		"mp4" : "avc1.4D401E, mp4a.40.2",
+    		"webm" : "vp8.0, vorbis"
+    	};
+
         createVideoElement(instanceID);
 
         playbackComplete = createEvent("PlaybackComplete");

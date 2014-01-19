@@ -128,10 +128,10 @@ $(document).ready (function(){
     /////////////////
 
     //Load just the mp4
-    //theVideo.loadFile(vidPath, false);
+    theVideo.loadFile(vidPath, false);
 
     //Load multiple formats
-    theVideo.loadFile(vidPathObj);
+    //theVideo.loadFile(vidPathObj);
 
     //Make sure the video element appears
     //before the controlsContainer
@@ -172,11 +172,9 @@ $(document).ready (function(){
     }
 
     function updateSlider() {
-
         if (isDragging === false) {
             seekSlider.slider( "value", theVideo.getCurrentTime());
             sliderValue = seekSlider.slider("option", "value");
-            //console.log("slideVal: " + slideVal);
         }
     }
 
@@ -185,7 +183,6 @@ $(document).ready (function(){
     }
 
     function onSlide() {
-
         if (useScrub === true) {
             sliderValue = seekSlider.slider("option", "value");
             theVideo.seek(sliderValue);
@@ -193,11 +190,8 @@ $(document).ready (function(){
     }
 
     function stopSlide(evt, ui) {
-
         sliderValue = seekSlider.slider("option", "value");
         theVideo.seek(sliderValue);
-        //seekSlider.slider( "value", theVideo.getCurrentTime());
-
         isDragging = false;
         console.log("stopSlide");
     }
