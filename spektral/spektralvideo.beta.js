@@ -179,6 +179,30 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.seek = function (time) {
 
+    	var 
+    		detectColon = matchPattern(time.toString(), ":"),
+    		detected = detectColon.isMatch, 
+    		matchArray, h, m, s,
+    		detectedAmount = detectColon.amount, i;
+
+    	//sv.log("detected: " + detected + " matchArray: " + matchArray + " detectedAmount: " + detectedAmount);
+
+    	if (detected === true) {
+    		matchArray = splitString(time, ":");
+    		if (detectedAmount === 1) {
+    			m = parseInt(matchArray[0]) * 60;
+    			s = parseInt(matchArray[1]);
+    			time = m + s;
+    		} else {
+    			h = (parseInt(matchArray[0]) * 60) * 60;
+    			m = parseInt(matchArray[1]) * 60;
+    			s = parseInt(matchArray[2]);
+    			time = h + m + s;  
+    		}
+    	}	
+
+    	//sv.log("seek: time: " + time);
+
         if (time > sv.getTotalTime) {
             videoElement.currentTime = sv.getTotalTime;
         } else if (time <= 0)
@@ -737,7 +761,30 @@ function SpektralVideo(container, instanceID, params) {
     	//sv.log("Looping: " + videoElement.loop);
     }
 
-    //UTILS
+    ////////////////////
+    ////ON AMOUNT LOADED
+    ////////////////////
+    function onAmountLoaded(evt) {
+    	var 
+    		rState = videoElement.readyState,
+    		percentage;
+ 
+    	if (rState >= 3) {
+    		percentage = Math.round(videoElement.buffered.end(0) / videoElement.duration * 100);
+    	} else { 
+    		percentage = 0;
+    	}
+
+    	if (percentage === 100) {
+    		sv.log("VIDEO LOADED");
+    		detachEventListener(videoElement, "progress", onAmountLoaded);
+    	}	
+    	return percentage;
+    }
+
+    //////////////////////
+    ////UTILS*************
+    //////////////////////
 
     ///////////////////////
     ////GET INFO
@@ -865,6 +912,75 @@ function SpektralVideo(container, instanceID, params) {
         clearTimeout(timeout);
     }
 
+    //////////////////
+    ////MATCH PATTERN
+    //////////////////
+    function matchPattern(request, pattern) {
+
+        var 
+            regEx = new RegExp(pattern, "g"),
+            matches = request.match(regEx),
+            isMatch = false, matchAmount = 0,
+            matchObj = {}, i;
+
+        if (matches !== null && pattern !== undefined) {
+
+            isMatch = true;
+            matchAmount = matches.length;
+        }
+
+        matchObj["isMatch"] = isMatch;
+        matchObj["amount"] = matchAmount;
+        matchObj["matches"] = matches;
+
+        return matchObj;
+    }
+
+    //////////////////
+    ////SPLIT STRING
+    //////////////////
+    function splitString(request, character) {
+
+        character = character || ",";
+
+        var 
+            splitArray = [], split, 
+            i, detectCharacter = matchPattern(request, character).isMatch, 
+            stripped;
+
+        if(detectCharacter === false && character !== " ") {
+            sv.log("splitString: Could not split string because character [" + character + "] was not in string.", "warn");
+        } else {
+            if(character !== " ") {
+                split = request.split(character);
+            } else {
+                split = request.split(/[ ,]+/);
+            }
+        }
+
+        for (i = 0; i < split.length; i += 1) {
+            if(split[i] !== "") {
+                stripped = stripWhiteSpace(split[i]);
+                splitArray.push(stripped);
+            }
+        }
+        return splitArray;
+    }
+
+    //////////////////
+    ////STRIP WHITE SPACE
+    //////////////////
+    function stripWhiteSpace(request, removeAll) {
+        removeAll = removeAll || false;
+        var newString;
+        if(removeAll !== false) {
+            newString = request.replace(/\s+/g, '');
+        } else {
+            newString = request.replace(/(^\s+|\s+$)/g,'');
+        }
+        return newString;
+    };
+
     ////////////////////
     ////GET PARAMETER
     ////////////////////
@@ -883,27 +999,6 @@ function SpektralVideo(container, instanceID, params) {
 	    	//sv.log("getParameter: object was not defined, setting " + param + " to default.")
 	    }
     	return retrievedParam;
-    }
-
-    ////////////////////
-    ////ON AMOUNT LOADED
-    ////////////////////
-    function onAmountLoaded(evt) {
-    	var 
-    		rState = videoElement.readyState,
-    		percentage;
- 
-    	if (rState >= 3) {
-    		percentage = Math.round(videoElement.buffered.end(0) / videoElement.duration * 100);
-    	} else { 
-    		percentage = 0;
-    	}
-    	
-    	if (percentage === 100) {
-    		sv.log("VIDEO LOADED");
-    		detachEventListener(videoElement, "progress", onAmountLoaded);
-    	}	
-    	return percentage;
     }
 
     //INITIALIZE THE VIDEO**************************************************************
