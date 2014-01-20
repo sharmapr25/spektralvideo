@@ -8,11 +8,13 @@ $(document).ready (function(){
         sliderTimer = false, isDragging = false,
         sliderValue = 0, useScrub = false,
         playbackState = "stopped", networkStatus, supportedFormat,
+        amountLoaded = 0,
         controls = document.getElementById("controlsContainer"),
         timeDisplay = document.getElementById("timeDisplay"),
         playbackDisplay = document.getElementById("playbackDisplay"),
         networkDisplay = document.getElementById("networkDisplay"),
         formatDisplay = document.getElementById("formatDisplay"),
+        loadedDisplay = document.getElementById("loadedDisplay"),
         playButton = document.getElementById("playButton"),
         pauseButton = document.getElementById("pauseButton"),
         togglePauseButton = document.getElementById("togglePauseButton"),
@@ -89,7 +91,7 @@ $(document).ready (function(){
             theVideo.togglePause();
             getPlayState();
         } else if (name === "stop") {
-            theVideo.stop();
+            theVideo.stop(true);
             stopSliderTimer();
             stopPBTimer();
             timeDisplay.innerHTML = "0:00 / 0:00";
@@ -238,7 +240,9 @@ $(document).ready (function(){
 
         networkStatus = theVideo.getNetworkState();
         networkDisplay.innerHTML = networkStatus;
-        //console.log("runningTime: " + runningTime.currentAndTotal);
+
+        amountLoaded = theVideo.getAmountLoaded();
+        loadedDisplay.innerHTML = amountLoaded.toString() + "%";
     }
 
     ////////////////////

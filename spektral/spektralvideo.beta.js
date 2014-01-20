@@ -37,7 +37,7 @@ function SpektralVideo(container, instanceID, params) {
 
         if (autoplay === true) {
         	videoElement.autoplay = true;
-        	videoElement.load();
+        	//videoElement.load();
         	if (sv.getReadyState() === "noInfo") {
         		autoplayTimer = createTimer(0.25, waitForData);
         	}
@@ -113,6 +113,8 @@ function SpektralVideo(container, instanceID, params) {
         	}
         }
 
+        attachEventListener(videoElement, "progress", onAmountLoaded);
+
         //sv.log("play: totalTime: " + sv.getTotalTime());
 
         playbackState = "playing";
@@ -170,7 +172,6 @@ function SpektralVideo(container, instanceID, params) {
         sv.pause();
         videoElement.src = "";
         clearTimer(playbackTimer);
-        playbackTimer = false;
     }
 
     ///////////////////////
@@ -394,6 +395,9 @@ function SpektralVideo(container, instanceID, params) {
         return videoElement.duration;
     }
 
+    //////////////////////
+    ////ATTACH EVENT
+    //////////////////////
     sv.attachEvent = function (evt, handler) {
     	attachEventListener(videoElement, evt, handler);
     }
@@ -403,6 +407,25 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.onVideoComplete = function (handler) {
     	attachEventListener(videoElement, "PlaybackComplete", handler);
+    }
+
+    //////////////////////
+    ////GET AMOUNT LOADED
+    //////////////////////
+    sv.getAmountLoaded = function () {
+    	var 
+    		buff = videoElement.buffered, 
+    		dur = videoElement.duration,
+    		end, percentage;
+
+    	try {
+    		end = buff.end(0)
+    	} catch (err) {
+    		end = 0;
+    	}
+    	percentage = Math.round((end/dur) * 100);
+
+    	return percentage;
     }
 
     //////////////////////
@@ -640,7 +663,7 @@ function SpektralVideo(container, instanceID, params) {
         	createSetAttribute(videoElement, "class", videoClass);
         }
 
-        attachEventListener(videoElement, "loadedmetadata", onLoadedMetaData);
+        attachEventListener(videoElement, "loadedmetadata", onLoadedMetaData);    
         //Add video element to container
         container.appendChild(videoElement);
     }
@@ -825,6 +848,7 @@ function SpektralVideo(container, instanceID, params) {
     ////////////////////
     function clearTimer(timer) {
         clearInterval(timer);
+        timer = false;
     }
 
     ////////////////////
@@ -863,6 +887,34 @@ function SpektralVideo(container, instanceID, params) {
     	return retrievedParam;
     }
 
+    ////////////////////
+    ////ON AMOUNT LOADED
+    ////////////////////
+    function onAmountLoaded(evt) {
+    	//sv.log("onAmountLoaded");
+    	var 
+    		buff = videoElement.buffered, 
+    		dur = videoElement.duration,
+    		end, percentage;
+
+    		try {
+    			end = buff.end(0);
+    			//sv.log("It worked!!!!");
+    		} catch (err) {
+    			//sv.log("that was the error")
+    		}
+    		percentage = Math.round((end/dur) * 100);
+
+    	//sv.log("end: " + end);
+
+    	if (percentage === 100) {
+    		sv.log("VIDEO LOADED");
+    		detachEventListener(videoElement, "progress", onAmountLoaded);
+    	}	
+
+    	//sv.log("percentage: " + percentage);	
+    }
+
     //INITIALIZE THE VIDEO**************************************************************
     initVideo();
 
@@ -878,9 +930,7 @@ function SpektralVideo(container, instanceID, params) {
     	};
 
         createVideoElement(instanceID);
-
         playbackComplete = createEvent("PlaybackComplete");
-
         attachEventListener(videoElement, "PlaybackComplete", onPlaybackComplete);
 
         //Controls
