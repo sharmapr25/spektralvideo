@@ -39,7 +39,11 @@ $(document).ready (function(){
         "ogv" : "video/bigbuckbunny/BigBuckBunny_320x180.ogv",
         "webm" : "video/bigbuckbunny/BigBuckBunny_320x180.webm"};
 
-    theVideo = new SpektralVideo(vidContainer, "theVideo", {"debug" : true, "muted" : true, "class" : "videoClass"});
+    theVideo = new SpektralVideo(vidContainer, "theVideo", {
+        "debug" : true,
+        "muted" : true,
+        "class" : "videoClass"
+    });
 
     ////////////////
     ////EVENT LISTENERS
@@ -150,6 +154,8 @@ $(document).ready (function(){
     //Load multiple formats
     theVideo.loadFile(vidPathObj);
 
+    theVideo.onVideoComplete(onPlaybackComplete);
+
     //Make sure the video element appears
     //before the controlsContainer
     //This was when video was put into
@@ -244,6 +250,13 @@ $(document).ready (function(){
 
         supportedFormat = theVideo.getCurrentType();
         formatDisplay.innerHTML = supportedFormat;
+    }
+
+    ////////////////////
+    ////ON PLAYBACK COMPLETE
+    /////////////////////
+    function onPlaybackComplete(evt) {
+        console.log("PLAYBACK COMPLETE!!!: " + evt.target);
     }
 
     //HELPERS

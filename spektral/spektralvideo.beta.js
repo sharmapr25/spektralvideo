@@ -41,7 +41,7 @@ function SpektralVideo(container, instanceID, params) {
         	if (sv.getReadyState() === "noInfo") {
         		autoplayTimer = createTimer(0.25, waitForData);
         	}
-        	sv.log("AUTOPLAY: READY STATE: " + sv.getReadyState());
+        	//sv.log("AUTOPLAY: READY STATE: " + sv.getReadyState());
         }
 
         function waitForData() {
@@ -51,7 +51,7 @@ function SpektralVideo(container, instanceID, params) {
         	}
     	}
 
-        sv.log("loadFile: path: " + pathType);
+        //sv.log("loadFile: path: " + pathType);
     }
 
     ///////////////////////
@@ -67,7 +67,7 @@ function SpektralVideo(container, instanceID, params) {
     		time = getParameter(playParams, "time", 0), 
     		pTimer = false;
 
-        sv.log("play: regularSpeed: " + rSpeed + " time: " + time);
+        //sv.log("play: regularSpeed: " + rSpeed + " time: " + time);
 
         //sv.log("playbackTimer: " + playbackTimer);
 
@@ -83,15 +83,15 @@ function SpektralVideo(container, instanceID, params) {
         }
 
         if (playbackState === "fastForwarding" || playbackState === "rewinding" || rSpeed === true) {
-        	sv.log("playbackState: " + playbackState);
-        	sv.log("regularSpeed: " + rSpeed);
+        	//sv.log("playbackState: " + playbackState);
+        	//sv.log("regularSpeed: " + rSpeed);
         	sv.playbackSpeed(1);
         }
 
         if(playbackState === "rewinding") {
         	clearTimer(rewindTimer);
         	rewindTimerStarted = false;
-        	sv.log("play: clearTimer")
+        	//sv.log("play: clearTimer")
         }
 
         if (time === 0) {
@@ -109,7 +109,7 @@ function SpektralVideo(container, instanceID, params) {
         	if (sv.getReadyState() === "haveEnough") {
         		clearTimer(pTimer);
         		sv.play();
-        		sv.log("CAN PLAY: Video wasn't ready.")
+        		//sv.log("CAN PLAY: Video wasn't ready.")
         	}
         }
 
@@ -211,7 +211,7 @@ function SpektralVideo(container, instanceID, params) {
         if(rewindTimerStarted === false) {
         	rewindTimerStarted = true;
         	rewindTimer = createTimer(0.025, stepBack);
-        	sv.log("rewind timer created!!!")
+        	//sv.log("rewind timer created!!!")
         }
 
         rewindRate = rewindRate += 0.05;
@@ -297,7 +297,7 @@ function SpektralVideo(container, instanceID, params) {
     	} else {
     		videoElement.loop = false;
     	}
-    	sv.log("loop: " + videoElement.loop);
+    	//sv.log("loop: " + videoElement.loop);
     }
 
     ///////////////////////
@@ -392,6 +392,17 @@ function SpektralVideo(container, instanceID, params) {
     sv.getTotalTime = function () {
         //Returns time in seconds
         return videoElement.duration;
+    }
+
+    sv.attachEvent = function (evt, handler) {
+    	attachEventListener(videoElement, evt, handler);
+    }
+
+    //////////////////////
+    ////ON VIDEO COMPLETE
+    //////////////////////
+    sv.onVideoComplete = function (handler) {
+    	attachEventListener(videoElement, "PlaybackComplete", handler);
     }
 
     //////////////////////
@@ -531,7 +542,7 @@ function SpektralVideo(container, instanceID, params) {
     ////GET PLAYBACK STATE
     //////////////////////
    	sv.getPlaybackState = function () {
-   		sv.log("playbackState: " + playbackState);
+   		//sv.log("playbackState: " + playbackState);
    		return playbackState;
    	}
 
@@ -624,7 +635,7 @@ function SpektralVideo(container, instanceID, params) {
         createSetAttribute(videoElement, "id", elID);
         createSetAttribute(videoElement, "style", "visibility:hidden");
 
-        sv.log("createVideoElement: videoClass: " + videoClass);
+        //sv.log("createVideoElement: videoClass: " + videoClass);
         if (videoClass !== false) {
         	createSetAttribute(videoElement, "class", videoClass);
         }
@@ -700,8 +711,9 @@ function SpektralVideo(container, instanceID, params) {
     ////ON PLAYBACK COMPLETE
     //////////////////////
     function onPlaybackComplete() {
-    	sv.log("Playback is complete!!!!!!");
-    	sv.log("Looping: " + videoElement.loop);
+    	sv.log("Playback is complete!!!!!!: Private");
+    	sv.log("window is: " + window);
+    	//sv.log("Looping: " + videoElement.loop);
     }
 
     //UTILS
