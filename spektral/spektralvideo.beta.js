@@ -414,16 +414,14 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.getAmountLoaded = function () {
     	var 
-    		buff = videoElement.buffered, 
-    		dur = videoElement.duration,
-    		end, percentage;
-
-    	try {
-    		end = buff.end(0)
-    	} catch (err) {
-    		end = 0;
+    		rState = videoElement.readyState,
+    		percentage;
+ 
+    	if (rState >= 3) {
+    		percentage = Math.round(videoElement.buffered.end(0) / videoElement.duration * 100);
+    	} else { 
+    		percentage = 0;
     	}
-    	percentage = Math.round((end/dur) * 100);
 
     	return percentage;
     }
@@ -891,28 +889,21 @@ function SpektralVideo(container, instanceID, params) {
     ////ON AMOUNT LOADED
     ////////////////////
     function onAmountLoaded(evt) {
-    	//sv.log("onAmountLoaded");
     	var 
-    		buff = videoElement.buffered, 
-    		dur = videoElement.duration,
-    		end, percentage;
-
-    		try {
-    			end = buff.end(0);
-    			//sv.log("It worked!!!!");
-    		} catch (err) {
-    			//sv.log("that was the error")
-    		}
-    		percentage = Math.round((end/dur) * 100);
-
-    	//sv.log("end: " + end);
-
+    		rState = videoElement.readyState,
+    		percentage;
+ 
+    	if (rState >= 3) {
+    		percentage = Math.round(videoElement.buffered.end(0) / videoElement.duration * 100);
+    	} else { 
+    		percentage = 0;
+    	}
+    	
     	if (percentage === 100) {
     		sv.log("VIDEO LOADED");
     		detachEventListener(videoElement, "progress", onAmountLoaded);
     	}	
-
-    	//sv.log("percentage: " + percentage);	
+    	return percentage;
     }
 
     //INITIALIZE THE VIDEO**************************************************************

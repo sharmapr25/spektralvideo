@@ -91,7 +91,7 @@ $(document).ready (function(){
             theVideo.togglePause();
             getPlayState();
         } else if (name === "stop") {
-            theVideo.stop(true);
+            theVideo.stop();
             stopSliderTimer();
             stopPBTimer();
             timeDisplay.innerHTML = "0:00 / 0:00";
