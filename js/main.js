@@ -320,6 +320,8 @@ $(document).ready (function(){
         amountLoaded = theVideo.getAmountLoaded();
         loadedDisplay.innerHTML = amountLoaded.toString() + "%";
 
+        console.log("fullScreenAllowed: " + theVideo.fullScreenAllowed());
+
         setVideoSize();
     }
 

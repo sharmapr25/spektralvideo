@@ -513,12 +513,21 @@ function SpektralVideo(container, instanceID, params) {
     }
 
     ///////////////////////
-    ////IS IN FULL SCREEN
+    ////IN FULL SCREEN
     //////////////////////
-    sv.isInFullScreen = function () {
+    sv.inFullScreen = function () {
     	//fullscreenElement
-    	var fsElement = videoElement.fullscreenElement || videoElement.mozFullScreenElement || videoElement.webkitFullscreenElement || videoElement.msFullscreenElement;
-    	sv.log("isInFullScreen: " + fsElement);
+    	var 
+    		fsElement = document.fullscreenElement || 
+    		document.mozFullScreenElement || 
+    		document.webkitFullscreenElement || 
+    		document.msFullscreenElement,
+    		inFS = false;
+
+    	if (fsElement !== undefined) {
+    		inFS = true;
+    	}	
+    	return inFS;
     }
 
     ///////////////////////
@@ -526,8 +535,20 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.fullScreenAllowed = function () {
     	//fullscreenEnabled
-    	var fsAllowed = videoElement.fullscreenEnabled || videoElement.mozFullScreenEnabled || videoElement.webkitFullscreenEnabled || videoElement.msFullscreenEnabled;
-    	sv.log("fullScreenAllowed: " + fsAllowed);
+    	//Not fully tested
+    	var 
+    		fsAllowed = document.fullscreenEnabled || 
+    		document.mozFullScreenEnabled ||
+    		document.webkitFullscreenEnabled || 
+    		document.msFullscreenEnabled, isAllowed = false;
+
+    	if (fsAllowed !== undefined) {
+    		isAllowed = true;
+    	}	
+
+    	sv.log("fsAllowed: " + fsAllowed);
+
+    	return isAllowed;
     }
 
     ///////////////////////
