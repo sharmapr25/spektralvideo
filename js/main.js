@@ -8,13 +8,15 @@ $(document).ready (function(){
         sliderTimer = false, isDragging = false,
         sliderValue = 0, useScrub = false,
         playbackState = "stopped", networkStatus, supportedFormat,
-        amountLoaded = 0,
+        amountLoaded = 0, sizeButtonArray, sizeButton, j,
         controls = document.getElementById("controlsContainer"),
         timeDisplay = document.getElementById("timeDisplay"),
         playbackDisplay = document.getElementById("playbackDisplay"),
         networkDisplay = document.getElementById("networkDisplay"),
         formatDisplay = document.getElementById("formatDisplay"),
         loadedDisplay = document.getElementById("loadedDisplay"),
+        sizeDisplay = document.getElementById("sizeDisplay"),
+
         playButton = document.getElementById("playButton"),
         pauseButton = document.getElementById("pauseButton"),
         togglePauseButton = document.getElementById("togglePauseButton"),
@@ -35,7 +37,13 @@ $(document).ready (function(){
         scrubButton = document.getElementById("scrubButton"),
         seekSlider = $("#seekSlider"),
         stepForwardButton = document.getElementById("stepForwardButton"),
-        stepBackButton = document.getElementById("stepBackButton");
+        stepBackButton = document.getElementById("stepBackButton"),
+        widthField = document.getElementById("widthField"),
+        widthButton = document.getElementById("widthButton"),
+        heightField = document.getElementById("heightField"),
+        heightButton = document.getElementById("heightButton"),
+
+        sizeButtonContainer = document.getElementById("sizeButtonContainer");
 
     //Object containing multiple formats of the same video
     vidPathObj = {
@@ -69,11 +77,25 @@ $(document).ready (function(){
     attachEventListener(scrubButton, "click", onButtonClick);
     attachEventListener(stepForwardButton, "click", onButtonClick);
     attachEventListener(stepBackButton, "click", onButtonClick);
+    attachEventListener(widthButton, "click", onButtonClick);
+    attachEventListener(heightButton, "click", onButtonClick);
+
 
     //To clear fields on focus
     attachEventListener(volField, "click", onFieldFocus);
     attachEventListener(seekField, "click", onFieldFocus);
     attachEventListener(speedField, "click", onFieldFocus);
+
+    /////////////////
+    ////SIZE BUTTONS
+    /////////////////
+    sizeButtonArray = getChildren(sizeButtonContainer);
+    console.log("sizeButtonArray: " + sizeButtonArray);
+
+    for (j = 0; j < sizeButtonArray.length; j += 1) {
+        sizeButton = sizeButtonArray[j];
+        attachEventListener(sizeButton, "click", onButtonClick);
+    }
 
     /////////////////
     ////ON BUTTON CLICK
@@ -143,6 +165,39 @@ $(document).ready (function(){
             theVideo.stepForward();
         } else if (name === "stepBack") {
             theVideo.stepBack();
+        } else if (name === "setWidth") {
+            theVideo.setWidth(widthField.value);
+        } else if (name === "setHeight") {
+            theVideo.setHeight(heightField.value);
+        } else if (name === "native") {
+            theVideo.setSize("native");
+            setVideoSize();
+        } else if (name === "240p") {
+            theVideo.setSize("240p");
+            setVideoSize();
+        } else if (name === "360p") {
+            theVideo.setSize("360p");
+            setVideoSize();
+        } else if (name === "480p") {
+            theVideo.setSize("480p");
+            setVideoSize();
+        } else if (name === "720p") {
+            theVideo.setSize("720p");
+            setVideoSize();
+        } else if (name === "1080p") {
+            theVideo.setSize("1080p");
+            setVideoSize();
+        } else if (name === "1440p") {
+            theVideo.setSize("1440p");
+            setVideoSize();
+        } else if (name === "2160p") {
+            theVideo.setSize("2160p");
+            setVideoSize();
+        } else if (name === "fill") {
+            theVideo.setSize("fill");
+            setVideoSize();
+        } else if (name === "fullScreen") {
+            theVideo.enterFullscreen();
         }
     }
 
@@ -151,6 +206,16 @@ $(document).ready (function(){
     /////////////////
     function onFieldFocus(evt) {
         evt.target.value = "";
+    }
+
+    ////////////////////
+    ////SET VIDEO SIZE
+    /////////////////////
+    function setVideoSize() {
+        var
+            vDimensions = theVideo.getDimensions(),
+            dimString = "Width: " + vDimensions.width.toString() + " Height: " + vDimensions.height.toString();
+        sizeDisplay.innerHTML = dimString;
     }
 
 
@@ -251,6 +316,8 @@ $(document).ready (function(){
 
         amountLoaded = theVideo.getAmountLoaded();
         loadedDisplay.innerHTML = amountLoaded.toString() + "%";
+
+        setVideoSize();
     }
 
     ////////////////////
@@ -299,5 +366,37 @@ $(document).ready (function(){
             eventTarget["on" + eventType] = null;
         }
     }
+
+    //////////////////
+    ////GET CHILDREN
+    /////////////////
+    function getChildren(parent) {
+        var
+            children = parent.childNodes,
+            childArr = [], i, isEl;
+
+        console.log("getChildren: children: " + children);
+
+        for (i = 0; i < children.length; i += 1) {
+            isEl = isElement(children[i]);
+            if(isEl === true) {
+                childArr.push(children[i]);
+            }
+        }
+        return childArr;
+    }
+
+    //////////////////
+    ////IS ELEMENT
+    /////////////////
+    function isElement(possibleElement) {
+        var isAnElement = false, type = possibleElement.nodeType;
+        if(type === 1) {
+            isAnElement = true;
+        }
+        return isAnElement;
+    }
+
+
 
 }(window));

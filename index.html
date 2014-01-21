@@ -34,6 +34,7 @@
                     <div id="networkDisplay"></div>
                     <div id="formatDisplay">NA</div>
                     <div id="loadedDisplay">0%</div>
+                    <div id="sizeDisplay">No size</div>
                 </div>
                 <input id="playButton" name="play" type="button" value="play"/>
                 <input id="pauseButton" name= "pause" type="button" value="pause"/>
@@ -62,7 +63,26 @@
                 <input id="stepForwardButton" name="stepForward" type="button" value="stepForward"/>
                 <input id="stepBackButton" name="stepBack" type="button" value="stepBack"/>
                 <div id="seekSlider"></div>
-
+                <form>
+                    Set Width: <input id="widthField" class="inputFields" type="text" value="">
+                    <input id="widthButton" name="setWidth" type="button" value="set width">
+                </form>
+                <form>
+                    Set Height: <input id="heightField" class="inputFields" type="text" value="">
+                    <input id="heightButton" name="setHeight" type="button" value="set height">
+                </form>
+                <div id="sizeButtonContainer">
+                    <input id="nativeButton" name="native" type="button" value="native"/>
+                    <input id="240Button" name="240p" type="button" value="240p"/>
+                    <input id="360Button" name="360p" type="button" value="360p"/>
+                    <input id="480Button" name="480p" type="button" value="480p"/>
+                    <input id="720Button" name="720p" type="button" value="720p"/>
+                    <input id="1080Button" name="1080p" type="button" value="1080p"/>
+                    <input id="1440Button" name="1440p" type="button" value="1440p"/>
+                    <input id="2160Button" name="2160p" type="button" value="2160p"/>
+                    <input id="fillButton" name="fill" type="button" value="fill"/>
+                    <input id="fullScreenButton" name="fullScreen" type="button" value="fullScreen"/>
+                </div>
             </div>
         </section>
         <footer id="mainFooter">

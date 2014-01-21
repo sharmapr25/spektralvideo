@@ -386,6 +386,13 @@ function SpektralVideo(container, instanceID, params) {
     }
 
     ///////////////////////
+    ////SET POSTER
+    //////////////////////
+    sv.setPoster = function (imageURL) {
+    	createSetAttribute(videoElement, "poster", imageURL);
+    }
+
+    ///////////////////////
     ////SET SIZE
     //////////////////////
     sv.setSize =  function (sizeParams) {
@@ -393,6 +400,49 @@ function SpektralVideo(container, instanceID, params) {
         //sizeParams can either be an object or string
         //If an object it should look like this: 
         //{"width" : "640", "height" : "320"}
+        var width, height, checkType = getType(sizeParams), viewport;
+        	
+        if (checkType === "object") {
+        	width = getParameter(sizeParams.width, false),
+        	height = getParameter(sizeParams.height, false);
+        	if (width !== false) {
+        	sv.setWidth(width);
+	        }
+	        if (height !== false) {
+	        	sv.setHeight(height);
+	        }
+        } else {
+
+        	if (sizeParams === "native") {
+        		sv.setWidth(videoElement.videoWidth);
+        		sv.setHeight(videoElement.videoHeight);
+        	} else if (sizeParams === "240p") {
+        		sv.setWidth(426);
+        		sv.setHeight(240)
+        	} else if (sizeParams === "360p") {
+        		sv.setWidth(640);
+        		sv.setHeight(360);
+        	} else if (sizeParams === "480p") {
+        		sv.setWidth(854);
+        		sv.setHeight(480);
+        	} else if (sizeParams === "720p") {
+        		sv.setWidth(1280);
+        		sv.setHeight(720);
+        	} else if (sizeParams === "1080p") {
+        		sv.setWidth(1920);
+        		sv.setHeight(1080);
+        	} else if (sizeParams === "1440p") {
+        		sv.setWidth(2560);
+        		sv.setHeight(1440);
+        	} else if (sizeParams === "2160p") {
+        		sv.setWidth(3840);
+        		sv.setHeight(2160);
+        	} else if (sizeParams === "fill") {
+        		viewport = getViewportSize();
+        		sv.setWidth(viewport.width);
+        		sv.setHeight(viewport.height);
+        	}
+        }
 
         //sizeParams can be a string with a video standard
         //Ex. "1080" = 1920x1080, "svga" = 800x600
@@ -408,15 +458,76 @@ function SpektralVideo(container, instanceID, params) {
     ///////////////////////
     ////SET WIDTH
     //////////////////////
-    sv.setWidth = function () {
+    sv.setWidth = function (vWidth) {
         //Sets the width of the video
+        videoElement.width = vWidth;
     }
 
     ///////////////////////
     ////SET HEIGHT
     //////////////////////
-    sv.setHeight = function () {
+    sv.setHeight = function (vHeight) {
         //Sets the height of the video
+        videoElement.height = vHeight;
+    }
+
+    ///////////////////////
+    ////GET DIMENSIONS
+    //////////////////////
+    sv.getDimensions = function () {
+    	var dimensions = {};
+    	dimensions["width"] = videoElement.width;
+    	dimensions["height"] = videoElement.height;
+    	sv.log("getDimensions: width: " + videoElement.width + " height: " + videoElement.height);
+    	return dimensions;
+    }
+
+    ///////////////////////
+    ////ENTER FULLSCREEN
+    //////////////////////
+    sv.enterFullscreen = function () {
+    	if (videoElement.requestFullscreen) {
+		  videoElement.requestFullscreen();
+		} else if (videoElement.msRequestFullscreen) {
+		  videoElement.msRequestFullscreen();
+		} else if (videoElement.mozRequestFullScreen) {
+		  videoElement.mozRequestFullScreen();
+		} else if (videoElement.webkitRequestFullscreen) {
+		  videoElement.webkitRequestFullscreen();
+		}
+    }
+
+    ///////////////////////
+    ////EXIT FULLSCREEN
+    //////////////////////
+    sv.exitFullscreen = function () {
+    	if (videoElement.exitFullscreen) {
+    		videoElement.exitFullscreen();
+    	} else if (videoElement.mozCancelFullScreen) {
+    		videoElement.mozCancelFullScreen();
+    	} else if (videoElement.webkitExitFullscreen) {
+    		videoElement.webkitExitFullscreen();
+    	} else if (videoElement.msExitFullscreen) {
+    		videoElement.msExitFullscreen();
+    	}
+    }
+
+    ///////////////////////
+    ////IS IN FULL SCREEN
+    //////////////////////
+    sv.isInFullScreen = function () {
+    	//fullscreenElement
+    	var fsElement = videoElement.fullscreenElement || videoElement.mozFullScreenElement || videoElement.webkitFullscreenElement || videoElement.msFullscreenElement;
+    	sv.log("isInFullScreen: " + fsElement);
+    }
+
+    ///////////////////////
+    ////FULL SCREEN ALLOWED
+    //////////////////////
+    sv.fullScreenAllowed = function () {
+    	//fullscreenEnabled
+    	var fsAllowed = videoElement.fullscreenEnabled || videoElement.mozFullScreenEnabled || videoElement.webkitFullscreenEnabled || videoElement.msFullscreenEnabled;
+    	sv.log("fullScreenAllowed: " + fsAllowed);
     }
 
     ///////////////////////
@@ -1023,6 +1134,34 @@ function SpektralVideo(container, instanceID, params) {
 	    	//sv.log("getParameter: object was not defined, setting " + param + " to default.")
 	    }
     	return retrievedParam;
+    }
+
+    ///////////////////
+    ////GET VIEWPORT SIZE
+    ///////////////////
+    function getViewportSize() {
+        var w, h, vPort = {};
+        //Width
+        if (window.innerWidth) {
+            w = window.innerWidth;
+        } else if (document.body && document.body.offsetWidth) {
+            w = document.body.offsetWidth;
+        } else {
+            w = null;
+        }
+        //Height
+        if (window.innerHeight) {
+            h = window.innerHeight;
+        } else if (document.body && document.body.offsetHeight) {
+            h = document.body.offsetHeight;
+        } else {
+            h = null;
+        }
+
+        vPort["width"] = w;
+        vPort["height"] = h;
+
+        return vPort;
     }
 
     //INITIALIZE THE VIDEO**************************************************************
