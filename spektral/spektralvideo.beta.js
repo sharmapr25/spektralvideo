@@ -10,7 +10,7 @@ function SpektralVideo(container, instanceID, params) {
         debug = false, strictError = false, videoElement, currentPlaybackSpeed = 1,
  		playbackState = "stopped", muteState = "unmuted",
         rewindTimer, rewindTimerStarted = false,  rewindRate = 0,
-        playbackTimer, playbackComplete, possibleFormats;
+        playbackTimer, playbackComplete, possibleFormats, poster;
     ///////////////////////
     ////LOAD FILE
     //////////////////////
@@ -766,45 +766,9 @@ function SpektralVideo(container, instanceID, params) {
         }
     }
 
-    //////////////////////////////////
-    /////PARAMS
-    //////////////////////////////////
-    //Container
-    //If no container is defined, use body
-    //Also if container is an existing video 
-    //element, don't generate a video element,
-    //use the existing one
-    // if (container === null || container === undefined) {
-    //     sv.log("container is not set.", "warn");
-    // }
-
-    //Other possible params for the future
-    //speed, startTime
-    if(params === undefined) {
-        //No param set, set defaults
-        path = "none";
-        width = 640;
-        height = 320;
-        useDefaultControls = false;
-        isMuted = false;
-        videoClass = false;
-    } else {
-        debug = getParameter(params, "debug", false);
-        path = getParameter(params, "path", "none");
-        width = params.width;
-        height = params.height;
-        useDefaultControls = getParameter(params, "useDefaultControls", false);
-        isMuted = getParameter(params, "muted", false);
-        videoClass = getParameter(params, "class", false);
-    }
-
-    sv.log("params: debug: " + debug + 
-            " path: " + path + 
-            " width: " + width + 
-            " height: " + height + 
-            " useDefaultControls: " + useDefaultControls + 
-            "isMuted: " + isMuted +
-            "videoClass" + videoClass);
+    ////////////////////////////////////
+    ////PRIVATE FUNCTIONS***************
+    ////////////////////////////////////
 
     ///////////////////////
     ////CREATE VIDEO ELEMENT
@@ -818,6 +782,10 @@ function SpektralVideo(container, instanceID, params) {
         //sv.log("createVideoElement: videoClass: " + videoClass);
         if (videoClass !== false) {
         	createSetAttribute(videoElement, "class", videoClass);
+        }
+
+        if (poster !== false) {
+        	sv.setPoster(poster);
         }
 
         attachEventListener(videoElement, "loadedmetadata", onLoadedMetaData);    
@@ -842,7 +810,7 @@ function SpektralVideo(container, instanceID, params) {
     function onLoadedMetaData(evt) {
         sv.log("Meta Data Loaded");
 
-        if (width === undefined) {
+        if (width === false) {
             width = videoElement.videoWidth;
             createSetAttribute(videoElement, "width", width);
         } else {
@@ -850,7 +818,7 @@ function SpektralVideo(container, instanceID, params) {
             createSetAttribute(videoElement, "width", width);
         }
 
-        if (height === undefined) {
+        if (height === false) {
             height = videoElement.videoHeight;
             createSetAttribute(videoElement, "height", height);
         } else {
@@ -1165,6 +1133,38 @@ function SpektralVideo(container, instanceID, params) {
     }
 
     //INITIALIZE THE VIDEO**************************************************************
+
+    //////////////////////////////////
+    /////PARAMS
+    //////////////////////////////////
+    //Container
+    //If no container is defined, use body
+    //Also if container is an existing video 
+    //element, don't generate a video element,
+    //use the existing one
+    // if (container === null || container === undefined) {
+    //     sv.log("container is not set.", "warn");
+    // }
+
+    //Other possible params for the future
+    //speed, startTime
+    debug = getParameter(params, "debug", false);
+    path = getParameter(params, "path", "none");
+    width = getParameter(params, "width", false);
+    height = getParameter(params, "height", false);
+    useDefaultControls = getParameter(params, "useDefaultControls", false);
+    isMuted = getParameter(params, "muted", false);
+    videoClass = getParameter(params, "class", false);
+    poster = getParameter(params, "poster", false);
+    
+    sv.log("params: debug: " + debug + 
+            " path: " + path + 
+            " width: " + width + 
+            " height: " + height + 
+            " useDefaultControls: " + useDefaultControls + 
+            "isMuted: " + isMuted +
+            "videoClass" + videoClass);
+
     initVideo();
 
     ///////////////////////

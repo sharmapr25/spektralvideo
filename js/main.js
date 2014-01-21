@@ -54,8 +54,11 @@ $(document).ready (function(){
     theVideo = new SpektralVideo(vidContainer, "theVideo", {
         "debug" : true,
         "muted" : true,
-        "class" : "videoClass"
+        "class" : "videoClass",
+        "poster" : "video/bigBuckBunny/BigBuckBunny.png"
     });
+
+    //theVideo.setPoster("video/bigBuckBunny/BigBuckBunny.png");
 
     ////////////////
     ////EVENT LISTENERS
