@@ -32,8 +32,10 @@ $(document).ready (function(){
         ffButton = document.getElementById("ffButton"),
         rewindButton = document.getElementById("rewindButton"),
         loopButton = document.getElementById("loopButton"),
+        scrubButton = document.getElementById("scrubButton"),
         seekSlider = $("#seekSlider"),
-        scrubButton = document.getElementById("scrubButton");
+        stepForwardButton = document.getElementById("stepForwardButton"),
+        stepBackButton = document.getElementById("stepBackButton");
 
     //Object containing multiple formats of the same video
     vidPathObj = {
@@ -65,6 +67,8 @@ $(document).ready (function(){
     attachEventListener(rewindButton, "click", onButtonClick);
     attachEventListener(loopButton, "click", onButtonClick);
     attachEventListener(scrubButton, "click", onButtonClick);
+    attachEventListener(stepForwardButton, "click", onButtonClick);
+    attachEventListener(stepBackButton, "click", onButtonClick);
 
     //To clear fields on focus
     attachEventListener(volField, "click", onFieldFocus);
@@ -135,6 +139,10 @@ $(document).ready (function(){
             } else {
                 useScrub = false;
             }
+        } else if (name === "stepForward") {
+            theVideo.stepForward();
+        } else if (name === "stepBack") {
+            theVideo.stepBack();
         }
     }
 

@@ -76,11 +76,11 @@ function SpektralVideo(container, instanceID, params) {
         	playbackTimer = createTimer(0.25, playbackChecker);
         }
 
-        if(muteState === "muted") {
-        	sv.mute();
-        } else {
-        	sv.unmute();
-        }
+        // if(muteState === "muted") {
+        // 	sv.mute();
+        // } else {
+        // 	sv.unmute();
+        // }
 
         if (playbackState === "fastForwarding" || playbackState === "rewinding" || rSpeed === true) {
         	//sv.log("playbackState: " + playbackState);
@@ -128,15 +128,12 @@ function SpektralVideo(container, instanceID, params) {
     ////PAUSE
     //////////////////////
     sv.pause = function () {
-
     	if (playbackState === "rewinding") {
     		clearTimer(rewindTimer);
     		rewindTimerStarted = false;
     	}
-
         videoElement.pause();
-        playbackState = "paused";
-    	
+        playbackState = "paused";	
     }
 
     ///////////////////////
@@ -155,7 +152,6 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.stop = function (stopDownload) {
         stopDownload = stopDownload || false;
-
         if (stopDownload === false) {
             sv.pause();
             sv.seek(0);
@@ -185,8 +181,8 @@ function SpektralVideo(container, instanceID, params) {
     		matchArray, h, m, s,
     		detectedAmount = detectColon.amount, i;
 
-    	//sv.log("detected: " + detected + " matchArray: " + matchArray + " detectedAmount: " + detectedAmount);
-
+    	//Check if time is formatted,
+    	//either m:s or h:m:s
     	if (detected === true) {
     		matchArray = splitString(time, ":");
     		if (detectedAmount === 1) {
@@ -200,8 +196,6 @@ function SpektralVideo(container, instanceID, params) {
     			time = h + m + s;  
     		}
     	}	
-
-    	//sv.log("seek: time: " + time);
 
         if (time > sv.getTotalTime) {
             videoElement.currentTime = sv.getTotalTime;
@@ -301,6 +295,36 @@ function SpektralVideo(container, instanceID, params) {
 
         playbackState = "fastForwarding";
     } 
+
+    ///////////////////////
+    ////STEP FORWARD
+    //////////////////////
+    sv.stepForward = function (stepAmount) {
+    	stepAmount = stepAmount || 0.5;
+    	var 
+    		newTime = sv.getCurrentTime() + stepAmount,
+    		videoDuration = sv.getTotalTime();
+    	sv.pause();
+    	if (newTime >= videoDuration) {
+    		videoElement.currentTime = videoDuration;
+    	} else {
+			videoElement.currentTime = newTime;
+    	}
+    }
+
+    ///////////////////////
+    ////STEP BACK
+    //////////////////////
+    sv.stepBack = function (stepAmount) {
+    	stepAmount = stepAmount || 0.5;
+    	var newTime = sv.getCurrentTime() - stepAmount;
+    	sv.pause();
+    	if (newTime <= 0) {
+    		videoElement.currentTime = 0;
+    	} else {
+    		videoElement.currentTime = newTime;
+    	}
+    }
 
     ///////////////////////
     ////PLAYBACK SPEED

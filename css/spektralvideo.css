@@ -63,6 +63,9 @@ video {
 #seekSlider {
   margin: 10px;
 }
+form {
+  display: inline-block;
+}
 #mainFooter small {
   position: relative;
   left: 50%;
