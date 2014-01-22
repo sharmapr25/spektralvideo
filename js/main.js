@@ -93,7 +93,6 @@ $(document).ready (function(){
     ////SIZE BUTTONS
     /////////////////
     sizeButtonArray = getChildren(sizeButtonContainer);
-    console.log("sizeButtonArray: " + sizeButtonArray);
 
     for (j = 0; j < sizeButtonArray.length; j += 1) {
         sizeButton = sizeButtonArray[j];
@@ -233,6 +232,8 @@ $(document).ready (function(){
     theVideo.loadFile(vidPathObj);
 
     theVideo.onVideoComplete(onPlaybackComplete);
+
+    theVideo.playSection(38, 40);
 
     //Make sure the video element appears
     //before the controlsContainer

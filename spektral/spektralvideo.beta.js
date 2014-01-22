@@ -336,6 +336,48 @@ function SpektralVideo(container, instanceID, params) {
     }
 
     ///////////////////////
+    ////PLAY SECTION
+    //////////////////////
+    sv.playSection = function (start, end) {
+
+    	sv.log("playSection: " + videoElement);
+    	var 
+    		timeChecker,
+    		endSeconds = sv.formatTime(end).secondsNum,
+    		readyCheck = createTimer(0.25, onReadyCheck);
+    		sv.play();
+    	//videoElement.load();
+    	//sv.seek(start);
+    	sv.log("playSection: start: " + start + " end: " + end);
+
+    	function onReadyCheck() {
+    		if (sv.getReadyState() === "haveEnough") {
+        		clearTimer(readyCheck);
+        		sv.play();
+        		sv.seek(start);
+        		timeChecker = createTimer(0.25, onTimeCheck);
+        	}
+    	}
+
+    	function onTimeCheck() {
+    		if (sv.getCurrentTime() >= endSeconds) {
+    			//If at end of section
+    			if (videoElement.loop === true) {
+    				//If looping, restart 
+    				//video at start point
+    				sv.seek(start);
+    			} else {
+    				//If loop is false, 
+    				//clearTimer and stop playback
+    				sv.stop();
+    				clearTimer(timeChecker);
+    			}
+    		}
+    		//sv.log("time checker");
+    	}
+    }
+
+    ///////////////////////
     ////LOOP
     //////////////////////
     sv.loop = function () {
@@ -345,7 +387,6 @@ function SpektralVideo(container, instanceID, params) {
     	} else {
     		videoElement.loop = false;
     	}
-    	//sv.log("loop: " + videoElement.loop);
     }
 
     ///////////////////////
@@ -856,18 +897,15 @@ function SpektralVideo(container, instanceID, params) {
         	sourceElem = document.createElement("source"),
         	typeAndCodec = "";	
         	
-        if (type === "mp4") {
- 			typeAndCodec = "video/" + type + "; codecs=\"avc1.42E01E, avc1.4D401E, mp4a.40.2\"";
-        } else if (type === "webm") {
-        	typeAndCodec = "video/" + type + "; codecs=\"vp8.0, vorbis\"";
-        } else if (type === "ogg" || type === "ogv") {
-        	typeAndCodec = "video/" + type + "; codecs=\"theora, vorbis\"";
-        } else if (type === "3gp") {
-        	typeAndCodec = "video/3gpp; codecs=\"mp4v.20.8, samr\"";
-        }	 
-
-        //Not set yet
-        sv.log("typeAndCodec: " + typeAndCodec);
+    //     if (type === "mp4") {
+ 			// typeAndCodec = "video/" + type + "; codecs=\"avc1.42E01E, avc1.4D401E, mp4a.40.2\"";
+    //     } else if (type === "webm") {
+    //     	typeAndCodec = "video/" + type + "; codecs=\"vp8.0, vorbis\"";
+    //     } else if (type === "ogg" || type === "ogv") {
+    //     	typeAndCodec = "video/" + type + "; codecs=\"theora, vorbis\"";
+    //     } else if (type === "3gp") {
+    //     	typeAndCodec = "video/3gpp; codecs=\"mp4v.20.8, samr\"";
+    //     }	 
 
         createSetAttribute(sourceElem, "src", source);
         createSetAttribute(sourceElem, "type", "video/" + type);
