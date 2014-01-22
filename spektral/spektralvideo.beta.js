@@ -11,6 +11,14 @@ function SpektralVideo(container, instanceID, params) {
  		playbackState = "stopped", muteState = "unmuted",
         rewindTimer, rewindTimerStarted = false,  rewindRate = 0,
         playbackTimer, playbackComplete, possibleFormats, poster;
+
+    ///////////////////////
+    ////GET VIDEO ELEMENT
+    //////////////////////
+    sv.getVideoElement = function () {
+    	return videoElement;
+    }    
+
     ///////////////////////
     ////LOAD FILE
     //////////////////////
@@ -67,33 +75,26 @@ function SpektralVideo(container, instanceID, params) {
     		time = getParameter(playParams, "time", 0), 
     		pTimer = false;
 
-        //sv.log("play: regularSpeed: " + rSpeed + " time: " + time);
-
-        //sv.log("playbackTimer: " + playbackTimer);
-
+		//If playback timer hasn't been started, start it	
         if (playbackTimer === undefined || playbackTimer === false) {
         	//Start playbackTimer if it hasn't been started
         	playbackTimer = createTimer(0.25, playbackChecker);
         }
 
-        // if(muteState === "muted") {
-        // 	sv.mute();
-        // } else {
-        // 	sv.unmute();
-        // }
-
+        //If video was fastForwarding, rewinding, or rSpeed is true then restore playbackSpeed to normal
         if (playbackState === "fastForwarding" || playbackState === "rewinding" || rSpeed === true) {
-        	//sv.log("playbackState: " + playbackState);
-        	//sv.log("regularSpeed: " + rSpeed);
         	sv.playbackSpeed(1);
         }
 
+        //If rewinding, stop it
         if(playbackState === "rewinding") {
         	clearTimer(rewindTimer);
         	rewindTimerStarted = false;
-        	//sv.log("play: clearTimer")
         }
 
+        //If time is 0, play. 
+        //If time is more than 0, 
+        //seek to that part and play.
         if (time === 0) {
             videoElement.play();
         } else {
@@ -101,27 +102,25 @@ function SpektralVideo(container, instanceID, params) {
             videoElement.play();
         }
 
+        //If the videos ready state is noInfo, 
+        //setup a timer to listen until video 
+        //is ready.
         if (sv.getReadyState() === "noInfo") {
         	pTimer = createTimer(0.25, canPlay);
         }
 
+        //Check videos ready state to 
+        //see if it's ready to play
         function canPlay() {
         	if (sv.getReadyState() === "haveEnough") {
         		clearTimer(pTimer);
         		sv.play();
-        		//sv.log("CAN PLAY: Video wasn't ready.")
         	}
         }
 
         attachEventListener(videoElement, "progress", onAmountLoaded);
 
-        //sv.log("play: totalTime: " + sv.getTotalTime());
-
         playbackState = "playing";
-
-        //Plays the video, will use the seek() method 
-        //if start time isn't 0
-        //time can be in seconds || minutes:seconds || hours:minutes:seconds
     }
 
     ///////////////////////
@@ -582,12 +581,46 @@ function SpektralVideo(container, instanceID, params) {
     	attachEventListener(videoElement, evt, handler);
     }
 
+    //VIDEO EVENTS START********************
+
     //////////////////////
     ////ON VIDEO COMPLETE
     //////////////////////
     sv.onVideoComplete = function (handler) {
     	attachEventListener(videoElement, "PlaybackComplete", handler);
     }
+
+    sv.attachVideoEvent = function (evt, handler) {
+    	if (evt === "canplaythrough") {
+    		//Fired when enough data is available that the browser 
+    		//believes it can play the video completely without interruption
+    		attachEventListener(videoElement, evt, handler);
+    	} else if (evt === "ended") {
+    		//Fired when the video has finished playing
+    		attachEventListener(videoElement, evt, handler);
+    	} else if (evt === "error") {
+    		//Fired if an error occurs
+    		attachEventListener(videoElement, evt, handler);
+    	} else if (evt === "playing") {
+    		//Fired when the video starts playing, for the first time, 
+    		//after being paused or when restarting
+    		attachEventListener(videoElement, evt, handler);
+    	} else if (evt === "progress") {
+    		//Fired periodically to indicate the progress of downloading the video
+    		attachEventListener(videoElement, evt, handler);
+    	} else if (evt === "waiting") {
+    		//Fired when an action is delayed pending the completion of another action
+    		attachEventListener(videoElement, evt, handler);
+    	} else if (evt === "loadedmetadata") {
+    		//Fired when the browser has finished loading the 
+    		//metadata for the video and all attributes have been populated
+    		attachEventListener(videoElement, evt, handler);
+    	} else {
+    		sv.log("attachVideoEvent: Event: " + evt + "not recognized.", "warn");
+    	}
+    }
+
+    //VIDEO EVENTS END********************
 
     //////////////////////
     ////GET AMOUNT LOADED
@@ -906,6 +939,26 @@ function SpektralVideo(container, instanceID, params) {
     	return percentage;
     }
 
+    ////////////////////
+    ////ATTACH EVENTS
+    ///////////////////
+    function attachEvents() {
+    	attachEventListener(videoElement, "canplaythrough", eventDispatcher);
+    	attachEventListener(videoElement, "ended", eventDispatcher);
+    	attachEventListener(videoElement, "error", eventDispatcher);
+    	attachEventListener(videoElement, "playing", eventDispatcher);
+    	attachEventListener(videoElement, "progress", eventDispatcher);
+    	attachEventListener(videoElement, "waiting", eventDispatcher);
+    	attachEventListener(videoElement, "loadedmetadata", eventDispatcher);
+    }
+
+    ////////////////////
+    ////EVENT DISPATCHER
+    ////////////////////
+    function eventDispatcher(evt) {
+    	//sv.log("Event dispatched: " + evt.type);
+    }
+
     //////////////////////
     ////UTILS*************
     //////////////////////
@@ -1202,6 +1255,8 @@ function SpektralVideo(container, instanceID, params) {
         createVideoElement(instanceID);
         playbackComplete = createEvent("PlaybackComplete");
         attachEventListener(videoElement, "PlaybackComplete", onPlaybackComplete);
+
+        attachEvents();
 
         //Controls
         //currently is being set larger than it should be

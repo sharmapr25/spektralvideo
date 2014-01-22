@@ -49,6 +49,9 @@ video {
 #formatDisplay:before {
   content: "Format used: ";
 }
+#loadedDisplay:before {
+  content: "Loading: ";
+}
 #controlsContainer {
   position: relative;
   margin: 0 auto;
