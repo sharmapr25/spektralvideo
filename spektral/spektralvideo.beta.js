@@ -852,7 +852,23 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     function createSourceElement(source, type) {
 
-        var sourceElem = document.createElement("source");
+        var 
+        	sourceElem = document.createElement("source"),
+        	typeAndCodec = "";	
+        	
+        if (type === "mp4") {
+ 			typeAndCodec = "video/" + type + "; codecs=\"avc1.42E01E, avc1.4D401E, mp4a.40.2\"";
+        } else if (type === "webm") {
+        	typeAndCodec = "video/" + type + "; codecs=\"vp8.0, vorbis\"";
+        } else if (type === "ogg" || type === "ogv") {
+        	typeAndCodec = "video/" + type + "; codecs=\"theora, vorbis\"";
+        } else if (type === "3gp") {
+        	typeAndCodec = "video/3gpp; codecs=\"mp4v.20.8, samr\"";
+        }	 
+
+        //Not set yet
+        sv.log("typeAndCodec: " + typeAndCodec);
+
         createSetAttribute(sourceElem, "src", source);
         createSetAttribute(sourceElem, "type", "video/" + type);
         videoElement.appendChild(sourceElem);
