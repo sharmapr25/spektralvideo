@@ -207,6 +207,14 @@ function SpektralVideo(container, instanceID, params) {
     }
 
     ///////////////////////
+    ////SEEK AND PLAY
+    //////////////////////
+    sv.seekAndPlay = function (time) {
+    	sv.seek(time);
+    	sv.play();
+    }
+
+    ///////////////////////
     ////REWIND
     //////////////////////
     sv.rewind = function (muteSound, speed) {
@@ -338,24 +346,25 @@ function SpektralVideo(container, instanceID, params) {
     ///////////////////////
     ////PLAY SECTION
     //////////////////////
-    sv.playSection = function (start, end) {
+    sv.playSection = function (start, end, loopVideo) {
 
     	sv.log("playSection: " + videoElement);
+    	loopVideo = loopVideo || false;
     	var 
     		timeChecker,
     		endSeconds = sv.formatTime(end).secondsNum,
     		readyCheck = createTimer(0.25, onReadyCheck);
-    		sv.play();
-    	//videoElement.load();
-    	//sv.seek(start);
     	sv.log("playSection: start: " + start + " end: " + end);
 
     	function onReadyCheck() {
     		if (sv.getReadyState() === "haveEnough") {
         		clearTimer(readyCheck);
-        		sv.play();
-        		sv.seek(start);
+        		sv.seekAndPlay(start);
         		timeChecker = createTimer(0.25, onTimeCheck);
+        		if (loopVideo === true) {
+        			sv.loop();
+        		}
+        		sv.log("playSection: videoReady")
         	}
     	}
 
@@ -365,12 +374,14 @@ function SpektralVideo(container, instanceID, params) {
     			if (videoElement.loop === true) {
     				//If looping, restart 
     				//video at start point
-    				sv.seek(start);
+    				sv.seekAndPlay(start);
+    				sv.log("playSection: looping")
     			} else {
     				//If loop is false, 
     				//clearTimer and stop playback
     				sv.stop();
     				clearTimer(timeChecker);
+    				sv.log("playSection: stop")
     			}
     		}
     		//sv.log("time checker");
@@ -518,7 +529,7 @@ function SpektralVideo(container, instanceID, params) {
     	var dimensions = {};
     	dimensions["width"] = videoElement.width;
     	dimensions["height"] = videoElement.height;
-    	sv.log("getDimensions: width: " + videoElement.width + " height: " + videoElement.height);
+    	//sv.log("getDimensions: width: " + videoElement.width + " height: " + videoElement.height);
     	return dimensions;
     }
 
@@ -586,7 +597,7 @@ function SpektralVideo(container, instanceID, params) {
     		isAllowed = true;
     	}	
 
-    	sv.log("fsAllowed: " + fsAllowed);
+    	//sv.log("fsAllowed: " + fsAllowed);
 
     	return isAllowed;
     }

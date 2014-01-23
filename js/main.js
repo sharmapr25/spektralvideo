@@ -110,20 +110,20 @@ $(document).ready (function(){
         if(name === "play") {
             theVideo.play({"regularSpeed" : true});
             setSliderValue();
-            startPBTimer();
-            getPlayState();
+            //startPBTimer();
+            //getPlayState();
         } else if (name === "pause") {
             theVideo.pause();
-            getPlayState();
+            //getPlayState();
         } else if (name === "togglePause") {
             theVideo.togglePause();
-            getPlayState();
+            //getPlayState();
         } else if (name === "stop") {
             theVideo.stop();
             stopSliderTimer();
             stopPBTimer();
             timeDisplay.innerHTML = "0:00 / 0:00";
-            getPlayState();
+            //getPlayState();
         } else if (name === "mute") {
             theVideo.mute();
         } else if (name === "unmute") {
@@ -142,7 +142,7 @@ $(document).ready (function(){
         } else if (name === "seek") {
             seekTime = seekField.value;
             theVideo.seek(seekTime);
-            getPlayState();
+            //getPlayState();
         } else if (name === "playbackSpeed") {
             pbSpeed = speedField.value;
             theVideo.playbackSpeed(pbSpeed);
@@ -151,10 +151,10 @@ $(document).ready (function(){
             theVideo.playbackSpeed(1);
         } else if (name === "fastForward") {
             theVideo.fastForward();
-            getPlayState();
+            //getPlayState();
         } else if (name === "rewind") {
             theVideo.rewind(true);
-            getPlayState();
+            //getPlayState();
         } else if (name === "loop") {
             theVideo.loop();
         } else if (name === "scrub") {
@@ -173,31 +173,31 @@ $(document).ready (function(){
             theVideo.setHeight(heightField.value);
         } else if (name === "native") {
             theVideo.setSize("native");
-            setVideoSize();
+            //setVideoSize();
         } else if (name === "240p") {
             theVideo.setSize("240p");
-            setVideoSize();
+            //setVideoSize();
         } else if (name === "360p") {
             theVideo.setSize("360p");
-            setVideoSize();
+            //setVideoSize();
         } else if (name === "480p") {
             theVideo.setSize("480p");
-            setVideoSize();
+            //setVideoSize();
         } else if (name === "720p") {
             theVideo.setSize("720p");
-            setVideoSize();
+            //setVideoSize();
         } else if (name === "1080p") {
             theVideo.setSize("1080p");
-            setVideoSize();
+            //setVideoSize();
         } else if (name === "1440p") {
             theVideo.setSize("1440p");
-            setVideoSize();
+            //setVideoSize();
         } else if (name === "2160p") {
             theVideo.setSize("2160p");
-            setVideoSize();
+            //setVideoSize();
         } else if (name === "fill") {
             theVideo.setSize("fill");
-            setVideoSize();
+            //setVideoSize();
         } else if (name === "fullScreen") {
             theVideo.enterFullscreen();
         }
@@ -217,7 +217,7 @@ $(document).ready (function(){
         var
             vDimensions = theVideo.getDimensions(),
             dimString = "Width: " + vDimensions.width.toString() + " Height: " + vDimensions.height.toString();
-        sizeDisplay.innerHTML = dimString;
+            sizeDisplay.innerHTML = dimString;
     }
 
 
@@ -233,7 +233,8 @@ $(document).ready (function(){
 
     theVideo.onVideoComplete(onPlaybackComplete);
 
-    theVideo.playSection(38, 40);
+    //theVideo.playSection(35, 40, true);
+    startPBTimer();
 
     //Make sure the video element appears
     //before the controlsContainer
@@ -321,8 +322,13 @@ $(document).ready (function(){
         amountLoaded = theVideo.getAmountLoaded();
         loadedDisplay.innerHTML = amountLoaded.toString() + "%";
 
-        console.log("fullScreenAllowed: " + theVideo.fullScreenAllowed());
+        playbackState = theVideo.getPlaybackState();
+        playbackDisplay.innerHTML = playbackState;
 
+        supportedFormat = theVideo.getCurrentType();
+        formatDisplay.innerHTML = supportedFormat;
+
+       // getPlayState();
         setVideoSize();
     }
 
@@ -335,6 +341,8 @@ $(document).ready (function(){
 
         supportedFormat = theVideo.getCurrentType();
         formatDisplay.innerHTML = supportedFormat;
+
+        //console.log("playbackState: " + playbackState)
     }
 
     ////////////////////
