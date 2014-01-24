@@ -348,7 +348,7 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.playSection = function (start, end, loopVideo) {
 
-    	sv.log("playSection: " + videoElement);
+    	sv.log("playSection: start: " + start + " end: " + end);
     	loopVideo = loopVideo || false;
     	var 
     		timeChecker,
@@ -398,6 +398,13 @@ function SpektralVideo(container, instanceID, params) {
     	} else {
     		videoElement.loop = false;
     	}
+    }
+
+    ///////////////////////
+    ////IS LOOPED
+    //////////////////////
+    sv.isLooped = function () {
+    	return videoElement.loop;
     }
 
     ///////////////////////

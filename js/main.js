@@ -7,6 +7,7 @@ $(document).ready (function(){
         runningTime = "", pbTimer = false,
         sliderTimer = false, isDragging = false,
         sliderValue = 0, useScrub = false,
+        videoLooped = false,
         playbackState = "stopped", networkStatus, supportedFormat,
         amountLoaded = 0, sizeButtonArray, sizeButton, j,
         controls = document.getElementById("controlsContainer"),
@@ -16,6 +17,7 @@ $(document).ready (function(){
         formatDisplay = document.getElementById("formatDisplay"),
         loadedDisplay = document.getElementById("loadedDisplay"),
         sizeDisplay = document.getElementById("sizeDisplay"),
+        loopDisplay = document.getElementById("loopDisplay"),
 
         playButton = document.getElementById("playButton"),
         pauseButton = document.getElementById("pauseButton"),
@@ -42,6 +44,9 @@ $(document).ready (function(){
         widthButton = document.getElementById("widthButton"),
         heightField = document.getElementById("heightField"),
         heightButton = document.getElementById("heightButton"),
+        startField = document.getElementById("startField"),
+        endField = document.getElementById("endField"),
+        playSectionButton = document.getElementById("playSectionButton"),
 
         sizeButtonContainer = document.getElementById("sizeButtonContainer");
 
@@ -82,6 +87,7 @@ $(document).ready (function(){
     attachEventListener(stepBackButton, "click", onButtonClick);
     attachEventListener(widthButton, "click", onButtonClick);
     attachEventListener(heightButton, "click", onButtonClick);
+    attachEventListener(playSectionButton, "click", onButtonClick);
 
 
     //To clear fields on focus
@@ -157,6 +163,14 @@ $(document).ready (function(){
             //getPlayState();
         } else if (name === "loop") {
             theVideo.loop();
+            videoLooped = theVideo.isLooped();
+            if (videoLooped === true) {
+                loopDisplay.innerHTML = "true";
+            } else {
+                loopDisplay.innerHTML = "false";
+            }
+            console.log("videoLooped: " + videoLooped);
+
         } else if (name === "scrub") {
             if (useScrub === false) {
                 useScrub = true;
@@ -200,6 +214,8 @@ $(document).ready (function(){
             //setVideoSize();
         } else if (name === "fullScreen") {
             theVideo.enterFullscreen();
+        } else if (name === "playSection") {
+            theVideo.playSection(startField.value, endField.value);
         }
     }
 
