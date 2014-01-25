@@ -166,6 +166,7 @@ function SpektralVideo(container, instanceID, params) {
     sv.unloadVideo = function () {
         sv.pause();
         videoElement.src = "";
+        sv.setPoster(poster);
         clearTimer(playbackTimer);
     }
 

@@ -2,14 +2,14 @@ $(document).ready (function(){
 
     var
         vidContainer = document.getElementById("videoContainer"),
-        vidPath = "video/bigbuckbunny/BigBuckBunny_320x180.mp4",
-        vidPathObj, theVideo, totalTime, elapsedTime, totalDuration,
+        vidPathObj, theVideo, totalTime,
         runningTime = "", pbTimer = false,
         sliderTimer = false, isDragging = false,
         sliderValue = 0, useScrub = false,
         videoLooped = false,
         playbackState = "stopped", networkStatus, supportedFormat,
-        amountLoaded = 0, sizeButtonArray, sizeButton, j,
+        amountLoaded = 0, sizeButtonArray, sizeButton, j, k,
+        controlButtonArray, controlButton,
         controls = document.getElementById("controlsContainer"),
         timeDisplay = document.getElementById("timeDisplay"),
         playbackDisplay = document.getElementById("playbackDisplay"),
@@ -18,28 +18,13 @@ $(document).ready (function(){
         loadedDisplay = document.getElementById("loadedDisplay"),
         sizeDisplay = document.getElementById("sizeDisplay"),
         loopDisplay = document.getElementById("loopDisplay"),
-
-        playButton = document.getElementById("playButton"),
-        pauseButton = document.getElementById("pauseButton"),
-        togglePauseButton = document.getElementById("togglePauseButton"),
-        stopButton = document.getElementById("stopButton"),
-        muteButton = document.getElementById("muteButton"),
-        unmuteButton = document.getElementById("unmuteButton"),
-        toggleMute = document.getElementById("toggleMuteButton"),
         volField = document.getElementById("volumeField"),
         volumeButton = document.getElementById("volumeButton"),
         seekField = document.getElementById("seekField"),
         seekButton = document.getElementById("seekButton"),
         speedField = document.getElementById("speedField"),
         speedButton = document.getElementById("speedButton"),
-        resetPBButton = document.getElementById("resetPBButton"),
-        ffButton = document.getElementById("ffButton"),
-        rewindButton = document.getElementById("rewindButton"),
-        loopButton = document.getElementById("loopButton"),
-        scrubButton = document.getElementById("scrubButton"),
         seekSlider = $("#seekSlider"),
-        stepForwardButton = document.getElementById("stepForwardButton"),
-        stepBackButton = document.getElementById("stepBackButton"),
         widthField = document.getElementById("widthField"),
         widthButton = document.getElementById("widthButton"),
         heightField = document.getElementById("heightField"),
@@ -47,7 +32,6 @@ $(document).ready (function(){
         startField = document.getElementById("startField"),
         endField = document.getElementById("endField"),
         playSectionButton = document.getElementById("playSectionButton"),
-
         sizeButtonContainer = document.getElementById("sizeButtonContainer");
 
     //Object containing multiple formats of the same video
@@ -63,37 +47,15 @@ $(document).ready (function(){
         "poster" : "video/bigBuckBunny/BigBuckBunny.png"
     });
 
-    //theVideo.setPoster("video/bigBuckBunny/BigBuckBunny.png");
+    //////////////////
+    ////CONTROL BUTTONS
+    //////////////////
+    controlButtonArray = getChildren(controls, "input");
 
-    ////////////////
-    ////EVENT LISTENERS
-    ////////////////
-    attachEventListener(playButton, "click", onButtonClick);
-    attachEventListener(pauseButton, "click", onButtonClick);
-    attachEventListener(togglePauseButton, "click", onButtonClick);
-    attachEventListener(stopButton, "click", onButtonClick);
-    attachEventListener(muteButton, "click", onButtonClick);
-    attachEventListener(unmuteButton, "click", onButtonClick);
-    attachEventListener(toggleMuteButton, "click", onButtonClick);
-    attachEventListener(volumeButton, "click", onButtonClick);
-    attachEventListener(seekButton, "click", onButtonClick);
-    attachEventListener(speedButton, "click", onButtonClick);
-    attachEventListener(resetPBButton, "click", onButtonClick);
-    attachEventListener(ffButton, "click", onButtonClick);
-    attachEventListener(rewindButton, "click", onButtonClick);
-    attachEventListener(loopButton, "click", onButtonClick);
-    attachEventListener(scrubButton, "click", onButtonClick);
-    attachEventListener(stepForwardButton, "click", onButtonClick);
-    attachEventListener(stepBackButton, "click", onButtonClick);
-    attachEventListener(widthButton, "click", onButtonClick);
-    attachEventListener(heightButton, "click", onButtonClick);
-    attachEventListener(playSectionButton, "click", onButtonClick);
-
-
-    //To clear fields on focus
-    attachEventListener(volField, "click", onFieldFocus);
-    attachEventListener(seekField, "click", onFieldFocus);
-    attachEventListener(speedField, "click", onFieldFocus);
+    for (k = 0; k < controlButtonArray.length; k += 1) {
+        controlButton = controlButtonArray[k];
+        attachEventListener(controlButton, "click", onButtonClick);
+    }
 
     /////////////////
     ////SIZE BUTTONS
@@ -104,6 +66,23 @@ $(document).ready (function(){
         sizeButton = sizeButtonArray[j];
         attachEventListener(sizeButton, "click", onButtonClick);
     }
+
+    ////////////////
+    ////EVENT LISTENERS
+    ////////////////
+    attachEventListener(volumeButton, "click", onButtonClick);
+    attachEventListener(seekButton, "click", onButtonClick);
+    attachEventListener(speedButton, "click", onButtonClick);
+    attachEventListener(widthButton, "click", onButtonClick);
+    attachEventListener(heightButton, "click", onButtonClick);
+    attachEventListener(playSectionButton, "click", onButtonClick);
+
+    //To clear fields on focus
+    attachEventListener(volField, "click", onFieldFocus);
+    attachEventListener(seekField, "click", onFieldFocus);
+    attachEventListener(speedField, "click", onFieldFocus);
+    attachEventListener(startField, "click", onFieldFocus);
+    attachEventListener(endField, "click", onFieldFocus);
 
     /////////////////
     ////ON BUTTON CLICK
@@ -116,20 +95,16 @@ $(document).ready (function(){
         if(name === "play") {
             theVideo.play({"regularSpeed" : true});
             setSliderValue();
-            //startPBTimer();
-            //getPlayState();
+            startPBTimer();
         } else if (name === "pause") {
             theVideo.pause();
-            //getPlayState();
         } else if (name === "togglePause") {
             theVideo.togglePause();
-            //getPlayState();
         } else if (name === "stop") {
             theVideo.stop();
             stopSliderTimer();
             stopPBTimer();
             timeDisplay.innerHTML = "0:00 / 0:00";
-            //getPlayState();
         } else if (name === "mute") {
             theVideo.mute();
         } else if (name === "unmute") {
@@ -148,7 +123,6 @@ $(document).ready (function(){
         } else if (name === "seek") {
             seekTime = seekField.value;
             theVideo.seek(seekTime);
-            //getPlayState();
         } else if (name === "playbackSpeed") {
             pbSpeed = speedField.value;
             theVideo.playbackSpeed(pbSpeed);
@@ -157,10 +131,8 @@ $(document).ready (function(){
             theVideo.playbackSpeed(1);
         } else if (name === "fastForward") {
             theVideo.fastForward();
-            //getPlayState();
         } else if (name === "rewind") {
             theVideo.rewind(true);
-            //getPlayState();
         } else if (name === "loop") {
             theVideo.loop();
             videoLooped = theVideo.isLooped();
@@ -169,13 +141,11 @@ $(document).ready (function(){
             } else {
                 loopDisplay.innerHTML = "false";
             }
-            console.log("videoLooped: " + videoLooped);
-
         } else if (name === "scrub") {
-            if (useScrub === false) {
-                useScrub = true;
-            } else {
+            if (useScrub === true) {
                 useScrub = false;
+            } else {
+                useScrub = true;
             }
         } else if (name === "stepForward") {
             theVideo.stepForward();
@@ -187,31 +157,22 @@ $(document).ready (function(){
             theVideo.setHeight(heightField.value);
         } else if (name === "native") {
             theVideo.setSize("native");
-            //setVideoSize();
         } else if (name === "240p") {
             theVideo.setSize("240p");
-            //setVideoSize();
         } else if (name === "360p") {
             theVideo.setSize("360p");
-            //setVideoSize();
         } else if (name === "480p") {
             theVideo.setSize("480p");
-            //setVideoSize();
         } else if (name === "720p") {
             theVideo.setSize("720p");
-            //setVideoSize();
         } else if (name === "1080p") {
             theVideo.setSize("1080p");
-            //setVideoSize();
         } else if (name === "1440p") {
             theVideo.setSize("1440p");
-            //setVideoSize();
         } else if (name === "2160p") {
             theVideo.setSize("2160p");
-            //setVideoSize();
         } else if (name === "fill") {
             theVideo.setSize("fill");
-            //setVideoSize();
         } else if (name === "fullScreen") {
             theVideo.enterFullscreen();
         } else if (name === "playSection") {
@@ -236,27 +197,17 @@ $(document).ready (function(){
             sizeDisplay.innerHTML = dimString;
     }
 
-
     /////////////////
     ////LOAD THE VIDEO FILES
     /////////////////
 
     //Load just the mp4
-    //theVideo.loadFile(vidPath, false);
+    //theVideo.loadFile("video/bigbuckbunny/BigBuckBunny_320x180.mp4", false);
 
     //Load multiple formats
     theVideo.loadFile(vidPathObj);
 
     theVideo.onVideoComplete(onPlaybackComplete);
-
-    //theVideo.playSection(35, 40, true);
-    startPBTimer();
-
-    //Make sure the video element appears
-    //before the controlsContainer
-    //This was when video was put into
-    //mainContent vs. videoContainer
-    //theVideo.insertBefore(controls);
 
     //////////////////
     ////INITIALIZE SEEK SLIDER
@@ -273,10 +224,12 @@ $(document).ready (function(){
     seekSlider.on("slide", function(event, ui) { onSlide(event, ui)});
     seekSlider.on("slidestop", function(event, ui) { stopSlide(event, ui)} );
 
+    ////////////////////
+    ////SET SLIDER VALUE
+    /////////////////////
     function setSliderValue() {
         totalTime = theVideo.getTotalTime();
         seekSlider.slider("option", "max", totalTime);
-        var sliderMax = seekSlider.slider("option", "max");
 
         //If sliderTimer hasn't bee started
         if (sliderTimer === false) {
@@ -284,11 +237,17 @@ $(document).ready (function(){
         }
     }
 
+    ////////////////////
+    ////STOP SLIDER TIMER
+    /////////////////////
     function stopSliderTimer() {
         clearInterval(sliderTimer);
         sliderTimer = false;
     }
 
+    ////////////////////
+    ////UPDATE SLIDER
+    /////////////////////
     function updateSlider() {
         if (isDragging === false) {
             seekSlider.slider( "value", theVideo.getCurrentTime());
@@ -296,10 +255,16 @@ $(document).ready (function(){
         }
     }
 
+    ////////////////////
+    ////START SLIDER
+    /////////////////////
     function startSlide(evt, ui) {
         isDragging = true;
     }
 
+    ////////////////////
+    ////ON SLIDE
+    /////////////////////
     function onSlide() {
         if (useScrub === true) {
             sliderValue = seekSlider.slider("option", "value");
@@ -307,6 +272,9 @@ $(document).ready (function(){
         }
     }
 
+    ////////////////////
+    ////STOP SLIDE
+    /////////////////////
     function stopSlide(evt, ui) {
         sliderValue = seekSlider.slider("option", "value");
         theVideo.seek(sliderValue);
@@ -328,6 +296,9 @@ $(document).ready (function(){
         pbTimer = false;
     }
 
+    ////////////////////
+    ////ON PLAYBACK
+    /////////////////////
     function onPlayback() {
         runningTime = theVideo.getFormattedTime();
         timeDisplay.innerHTML = runningTime.currentAndTotal;
@@ -344,21 +315,7 @@ $(document).ready (function(){
         supportedFormat = theVideo.getCurrentType();
         formatDisplay.innerHTML = supportedFormat;
 
-       // getPlayState();
         setVideoSize();
-    }
-
-    ////////////////////
-    ////GET PLAY STATE
-    /////////////////////
-    function getPlayState() {
-        playbackState = theVideo.getPlaybackState();
-        playbackDisplay.innerHTML = playbackState;
-
-        supportedFormat = theVideo.getCurrentType();
-        formatDisplay.innerHTML = supportedFormat;
-
-        //console.log("playbackState: " + playbackState)
     }
 
     ////////////////////
@@ -400,17 +357,23 @@ $(document).ready (function(){
     //////////////////
     ////GET CHILDREN
     /////////////////
-    function getChildren(parent) {
+    function getChildren(parent, type) {
+        type = type || "all"
         var
             children = parent.childNodes,
-            childArr = [], i, isEl;
-
-        console.log("getChildren: children: " + children);
+            childArr = [], i, isEl, nodeType;
 
         for (i = 0; i < children.length; i += 1) {
             isEl = isElement(children[i]);
             if(isEl === true) {
-                childArr.push(children[i]);
+                nodeType = getType(children[i]);
+                if (type === "all") {
+                    childArr.push(children[i]);
+                } else {
+                    if (nodeType === type) {
+                        childArr.push(children[i]);
+                    }
+                }
             }
         }
         return childArr;
@@ -427,6 +390,20 @@ $(document).ready (function(){
         return isAnElement;
     }
 
-
+    ////////////////////
+    ////GET TYPE
+    ////////////////////
+    function getType(obj) {
+        var type;
+        if(obj.nodeName !== undefined) {
+            //element
+            type = (obj.nodeName);
+        } else {
+            //everything else
+            type = ({}).toString.call(obj).match(/\s([a-zA-Z]+)/)[1]
+        }
+        type = type.toLowerCase();
+        return type;
+    };
 
 }(window));
