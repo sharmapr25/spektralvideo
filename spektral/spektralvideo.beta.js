@@ -6,7 +6,7 @@ function SpektralVideo(container, instanceID, params) {
     //Private Vars
     var 
         sv = this,
-        container, path, width, height, useDefaultControls, isMuted, videoClass,
+        container, path, width, height, useDefaultControls, videoMuted, videoClass,
         debug = false, strictError = false, videoElement, currentPlaybackSpeed = 1,
  		playbackState = "stopped", muteState = "unmuted",
         rewindTimer, rewindTimerStarted = false,  rewindRate = 0,
@@ -445,6 +445,12 @@ function SpektralVideo(container, instanceID, params) {
         } else {
             sv.mute();
         }
+    }
+    ///////////////////////
+    ////IS MUTED
+    //////////////////////
+    sv.isMuted = function () {
+    	return videoElement.muted;
     }
 
     ///////////////////////
@@ -1024,8 +1030,37 @@ function SpektralVideo(container, instanceID, params) {
     	sv.log(instanceID + ": an error occurred: " + evt, "warn");
     }
 
+    ////////////////////
+    ////CHECK FOR TIME HASH
+    ////////////////////
+    sv.checkForTimeHash = function() {
+    	var 
+    		hashTag = getHash(),
+    		hashDetected = false,
+    		hasTime,
+    		timeDetected = false,
+    		timeObj = {}, i;
+    	if (hashTag !== false) {
+    		//hash is present, check for time
+    		hashDetected = true;
+    		hasTime = hasPattern(hashTag, "t=");
+    		if (hasTime.match === true) {
+    			//time detected!!!
+    		} else {
+    			timeObj = false;
+    		}
+    		
+    	} else {
+    		timeObj = false;
+    	}
+
+    	return timeObj;
+    }
+
+
+
     //////////////////////
-    ////UTILS*************
+    ////UTILS****************************************************
     //////////////////////
 
     ///////////////////////
@@ -1271,6 +1306,67 @@ function SpektralVideo(container, instanceID, params) {
         return vPort;
     }
 
+    function getHash() {
+    	var 
+    		hashTag = window.location.hash;
+    	if (hashTag === "") {
+    		hashTag = false;
+    	}
+    	return hashTag;
+    }
+
+    function detectCharacter(request, character) {
+    	var 
+    		detected = false, 
+    		test = request.match(character);
+        if(test !== null) {
+            detected = true;
+        }
+        return detected;
+    }
+
+    ////////////////////
+    ////GET QUERY STRING
+    ////////////////////
+    function getQueryString() {
+
+        var 
+            queryParams = {},
+            query = location.search,
+            queryString, valArray, i, value;
+        if(query === "") {
+            sv.log("getQueryString: No query string was found.", "warn");
+        } else {
+            queryString = query.split("?").pop();
+            valArray = splitString(queryString, "&");
+            for (i = 0; i < valArray.length; i += 1) {
+                value = splitString(valArray[i], "=");
+                queryParams[value[0]] = value[1];
+            }
+        }
+        return queryParams;    
+    }
+
+    //////////////////
+    ////HAS PATTERN
+    //////////////////
+    function hasPattern(request, pattern) {
+        var 
+            regEx = new RegExp(pattern, "g"),
+            matches = request.match(regEx),
+            hasMatch = false, matchAmount = 0,
+            matchObj = {}, i;
+        if (matches !== null) {
+            hasMatch = true;
+            matchAmount = matches.length;
+        }
+        matchObj["match"] = hasMatch;
+        matchObj["amount"] = matchAmount;
+        matchObj["matchArray"] = matches;
+        sv.log("matchObj: " + JSON.stringify(matchObj));
+        return matchObj;
+    };
+
     //INITIALIZE THE VIDEO**************************************************************
 
     //////////////////////////////////
@@ -1292,7 +1388,7 @@ function SpektralVideo(container, instanceID, params) {
     width = getParameter(params, "width", false);
     height = getParameter(params, "height", false);
     useDefaultControls = getParameter(params, "useDefaultControls", false);
-    isMuted = getParameter(params, "muted", false);
+    videoMuted = getParameter(params, "muted", false);
     videoClass = getParameter(params, "class", false);
     poster = getParameter(params, "poster", false);
     
@@ -1301,7 +1397,7 @@ function SpektralVideo(container, instanceID, params) {
             " width: " + width + 
             " height: " + height + 
             " useDefaultControls: " + useDefaultControls + 
-            "isMuted: " + isMuted +
+            "videoMuted: " + videoMuted +
             "videoClass" + videoClass);
 
     initVideo();
@@ -1332,7 +1428,7 @@ function SpektralVideo(container, instanceID, params) {
             createSetAttribute(videoElement, "controls");
         }
 
-        if (isMuted === true) {
+        if (videoMuted === true) {
         	sv.mute();
         } 
     }

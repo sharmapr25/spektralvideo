@@ -6,7 +6,7 @@ $(document).ready (function(){
         runningTime = "", pbTimer = false,
         sliderTimer = false, isDragging = false,
         sliderValue = 0, useScrub = false,
-        videoLooped = false,
+        videoLooped = false, videoMuted,
         playbackState = "stopped", networkStatus, supportedFormat,
         amountLoaded = 0, sizeButtonArray, sizeButton, j, k,
         controlButtonArray, controlButton,
@@ -18,6 +18,7 @@ $(document).ready (function(){
         loadedDisplay = document.getElementById("loadedDisplay"),
         sizeDisplay = document.getElementById("sizeDisplay"),
         loopDisplay = document.getElementById("loopDisplay"),
+        muteDisplay = document.getElementById("muteDisplay"),
         volField = document.getElementById("volumeField"),
         volumeButton = document.getElementById("volumeButton"),
         seekField = document.getElementById("seekField"),
@@ -311,6 +312,9 @@ $(document).ready (function(){
         supportedFormat = theVideo.getCurrentType();
         formatDisplay.innerHTML = supportedFormat;
 
+        videoMuted = theVideo.isMuted();
+        muteDisplay.innerHTML = videoMuted;
+
         setVideoSize();
     }
 
@@ -320,6 +324,16 @@ $(document).ready (function(){
     function onPlaybackComplete(evt) {
         console.log("PLAYBACK COMPLETE!!!: " + evt.target);
     }
+
+
+    //Test for time hash - will remove
+    theVideo.play({"regularSpeed" : true});
+    setSliderValue();
+    startPBTimer();
+
+    theVideo.checkForTimeHash();
+
+
 
     //HELPERS
     //////////////////
