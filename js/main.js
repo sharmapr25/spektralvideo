@@ -44,7 +44,7 @@ $(document).ready (function(){
         "debug" : true,
         "muted" : true,
         "class" : "videoClass",
-        "poster" : "video/bigBuckBunny/BigBuckBunny.png"
+        "poster" : "video/bigbuckbunny/BigBuckBunny.png"
     });
 
     //////////////////
