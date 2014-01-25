@@ -67,6 +67,9 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.play = function (playParams) {
 
+    	//Check to see if source is set
+    	sv.getCurrentSource();
+
     	//regularSpeed determines if when play
     	//is invoked, whether the playBackSpeed
     	//should be restored to 1
@@ -816,12 +819,14 @@ function SpektralVideo(container, instanceID, params) {
     ////GET CURRENT SOURCE
     //////////////////////
     sv.getCurrentSource = function () {
-    	var source = videoElement.currentSrc;
-
+    	var 
+    		source = videoElement.currentSrc,
+    		sourceString = "nosource";
     	if (source === undefined || source === "") {
-    		sv.log("No supported formats available!", "warn");
+    		sv.log("No current source detected, either loadFile has not been invoked, or no supported formats are available.", "warn");
+    	} else {
+    		sourceString = source;
     	}
-
     	return source;
     }
 
@@ -1013,23 +1018,10 @@ function SpektralVideo(container, instanceID, params) {
     }
 
     ////////////////////
-    ////ATTACH EVENTS
-    ///////////////////
-    function attachEvents() {
-    	attachEventListener(videoElement, "canplaythrough", eventDispatcher);
-    	attachEventListener(videoElement, "ended", eventDispatcher);
-    	attachEventListener(videoElement, "error", eventDispatcher);
-    	attachEventListener(videoElement, "playing", eventDispatcher);
-    	attachEventListener(videoElement, "progress", eventDispatcher);
-    	attachEventListener(videoElement, "waiting", eventDispatcher);
-    	attachEventListener(videoElement, "loadedmetadata", eventDispatcher);
-    }
-
+    ////ON VIDEO ERROR
     ////////////////////
-    ////EVENT DISPATCHER
-    ////////////////////
-    function eventDispatcher(evt) {
-    	//sv.log("Event dispatched: " + evt.type);
+    function onVideoError(evt) {
+    	sv.log(instanceID + ": an error occurred: " + evt, "warn");
     }
 
     //////////////////////
@@ -1326,10 +1318,13 @@ function SpektralVideo(container, instanceID, params) {
     	};
 
         createVideoElement(instanceID);
+
+        //VideoError
+        sv.attachVideoEvent("error", onVideoError);
+
+        //PlaybackComplete
         playbackComplete = createEvent("PlaybackComplete");
         attachEventListener(videoElement, "PlaybackComplete", onPlaybackComplete);
-
-        attachEvents();
 
         //Controls
         //currently is being set larger than it should be

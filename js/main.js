@@ -47,6 +47,14 @@ $(document).ready (function(){
         "poster" : "video/bigbuckbunny/BigBuckBunny.png"
     });
 
+    //Load just the mp4
+    //theVideo.loadFile("video/bigbuckbunny/BigBuckBunny_320x180.mp4", false);
+
+    //Load multiple formats
+    theVideo.loadFile(vidPathObj);
+
+    theVideo.onVideoComplete(onPlaybackComplete);
+
     //////////////////
     ////CONTROL BUTTONS
     //////////////////
@@ -196,18 +204,6 @@ $(document).ready (function(){
             dimString = "Width: " + vDimensions.width.toString() + " Height: " + vDimensions.height.toString();
             sizeDisplay.innerHTML = dimString;
     }
-
-    /////////////////
-    ////LOAD THE VIDEO FILES
-    /////////////////
-
-    //Load just the mp4
-    //theVideo.loadFile("video/bigbuckbunny/BigBuckBunny_320x180.mp4", false);
-
-    //Load multiple formats
-    theVideo.loadFile(vidPathObj);
-
-    theVideo.onVideoComplete(onPlaybackComplete);
 
     //////////////////
     ////INITIALIZE SEEK SLIDER
