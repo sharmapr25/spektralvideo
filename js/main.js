@@ -325,16 +325,6 @@ $(document).ready (function(){
         console.log("PLAYBACK COMPLETE!!!: " + evt.target);
     }
 
-
-    //Test for time hash - will remove
-    theVideo.play({"regularSpeed" : true});
-    setSliderValue();
-    startPBTimer();
-
-    theVideo.checkForTimeHash();
-
-
-
     //HELPERS
     //////////////////
     ////ATTACH EVENT LISTENER

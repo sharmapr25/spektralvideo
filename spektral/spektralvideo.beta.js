@@ -121,7 +121,7 @@ function SpektralVideo(container, instanceID, params) {
         	}
         }
 
-        attachEventListener(videoElement, "progress", onAmountLoaded);
+        //attachEventListener(videoElement, "progress", onAmountLoaded);
 
         playbackState = "playing";
     }
@@ -214,6 +214,7 @@ function SpektralVideo(container, instanceID, params) {
     ////SEEK AND PLAY
     //////////////////////
     sv.seekAndPlay = function (time) {
+    	sv.log("seekAndPlay: readyState: " + sv.getReadyState());
     	sv.seek(time);
     	sv.play();
     }
@@ -904,16 +905,13 @@ function SpektralVideo(container, instanceID, params) {
         createSetAttribute(videoElement, "id", elID);
         createSetAttribute(videoElement, "style", "visibility:hidden");
 
-        //sv.log("createVideoElement: videoClass: " + videoClass);
         if (videoClass !== false) {
         	createSetAttribute(videoElement, "class", videoClass);
         }
 
         if (poster !== false) {
         	sv.setPoster(poster);
-        }
-
-        attachEventListener(videoElement, "loadedmetadata", onLoadedMetaData);    
+        }  
         //Add video element to container
         container.appendChild(videoElement);
     }
@@ -997,9 +995,7 @@ function SpektralVideo(container, instanceID, params) {
     ////ON PLAYBACK COMPLETE
     //////////////////////
     function onPlaybackComplete() {
-    	sv.log("Playback is complete!!!!!!: Private");
-    	sv.log("window is: " + window);
-    	//sv.log("Looping: " + videoElement.loop);
+    	sv.log("Playback is complete.")
     }
 
     ////////////////////
@@ -1030,32 +1026,7 @@ function SpektralVideo(container, instanceID, params) {
     	sv.log(instanceID + ": an error occurred: " + evt, "warn");
     }
 
-    ////////////////////
-    ////CHECK FOR TIME HASH
-    ////////////////////
-    sv.checkForTimeHash = function() {
-    	var 
-    		hashTag = getHash(),
-    		hashDetected = false,
-    		hasTime,
-    		timeDetected = false,
-    		timeObj = {}, i;
-    	if (hashTag !== false) {
-    		//hash is present, check for time
-    		hashDetected = true;
-    		hasTime = hasPattern(hashTag, "t=");
-    		if (hasTime.match === true) {
-    			//time detected!!!
-    		} else {
-    			timeObj = false;
-    		}
-    		
-    	} else {
-    		timeObj = false;
-    	}
 
-    	return timeObj;
-    }
 
 
 
@@ -1315,6 +1286,19 @@ function SpektralVideo(container, instanceID, params) {
     	return hashTag;
     }
 
+    function getHashValue(value) {
+    	var 
+    		paramObj = getHashString(), 
+    		key, returnValue = false;
+
+    	for (key in paramObj) {
+    		if (key === value) {
+    			returnValue = paramObj[key];
+    		}
+    	}
+    	return returnValue;
+    }
+
     function detectCharacter(request, character) {
     	var 
     		detected = false, 
@@ -1326,13 +1310,44 @@ function SpektralVideo(container, instanceID, params) {
     }
 
     ////////////////////
+    ////GET HASH STRING
+    ////////////////////
+    function getHashString() {
+
+        var 
+            hashParams = {},
+            hash = window.location.hash,
+            hasMultiple,
+            hashString, valArray, i, value;
+        if(hash === "") {
+            sv.log("getHashString: No hash tag was found.", "warn");
+        } else {
+            hashString = hash.split("#").pop();
+            hasMultiple = detectCharacter(hashString, "&");
+            if (hasMultiple === true) {
+            	//multiple values
+	        	valArray = splitString(hashString, "&");
+		        for (i = 0; i < valArray.length; i += 1) {
+		            value = splitString(valArray[i], "=");
+		            hashParams[value[0]] = value[1];
+		        }
+            } else {
+            	//single values
+            	value = splitString(hashString, "=");
+            	hashParams[value[0]] = value[1];
+            }
+        }
+        return hashParams;    
+    }
+
+    ////////////////////
     ////GET QUERY STRING
     ////////////////////
     function getQueryString() {
 
         var 
             queryParams = {},
-            query = location.search,
+            query = window.location.search,
             queryString, valArray, i, value;
         if(query === "") {
             sv.log("getQueryString: No query string was found.", "warn");
@@ -1363,9 +1378,60 @@ function SpektralVideo(container, instanceID, params) {
         matchObj["match"] = hasMatch;
         matchObj["amount"] = matchAmount;
         matchObj["matchArray"] = matches;
-        sv.log("matchObj: " + JSON.stringify(matchObj));
+        //sv.log("matchObj: " + JSON.stringify(matchObj));
         return matchObj;
-    };
+    }
+
+    ////////////////////
+    ////CHECK HASH FOR TIME
+    ////////////////////
+    function checkHashForTime() {
+    	//This can be simplified, which I'll do once I get it working
+    	var 
+    		hashTag = getHash(),
+    		timeValue, range,
+    		hashDetected = false,
+    		hasTime, timeType, hasComma,
+    		timeDetected = false,
+    		timeObj = {}, i;
+    	if (hashTag !== false) {
+    		//hash is present, check for time
+    		hashDetected = true;
+    		hasTime = hasPattern(hashTag, "t=");
+    		if (hasTime.match === true) {
+    			//time detected!!!
+    			//check if range or single time
+    			timeValue = getHashValue("t");
+    			hasComma = detectCharacter(timeValue, ",");
+    			if (hasComma === true) {
+    				//range
+    				range = splitString(timeValue, ",");
+    				//figure out loop
+    				sv.playSection(range[0], range[1]);
+    			} else {
+    				//single
+    				//Have to fix
+    				//sv.seekAndPlay(timeValue);
+    			}
+
+    			sv.log("hasComma: " + hasComma);
+
+    		} else {
+    			timeObj = false;
+    		}
+    		
+    	} else {
+    		timeObj = false;
+    	}
+
+    	if (getType(timeObj) === "object") {
+    		sv.log("checkHashForTime: timeObj: " + JSON.stringify(timeObj));
+    	} else {
+    		sv.log("checkHashForTime: timeObj: " + timeObj);
+    	}
+
+    	return timeObj;
+    }
 
     //INITIALIZE THE VIDEO**************************************************************
 
@@ -1407,6 +1473,8 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     function initVideo() {
 
+    	var timeHash;
+
     	possibleFormats = {
     		"ogg" : "theora, vorbis",
     		"mp4" : "avc1.4D401E, mp4a.40.2",
@@ -1415,12 +1483,23 @@ function SpektralVideo(container, instanceID, params) {
 
         createVideoElement(instanceID);
 
-        //VideoError
+        //loadedmetadata
+        sv.attachVideoEvent("loadedmetadata", onLoadedMetaData);
+
+        //progress
+        sv.attachVideoEvent("progress", onAmountLoaded);
+
+        //error
         sv.attachVideoEvent("error", onVideoError);
 
         //PlaybackComplete
         playbackComplete = createEvent("PlaybackComplete");
         attachEventListener(videoElement, "PlaybackComplete", onPlaybackComplete);
+
+        //Check for time in hash
+        timeHash = checkHashForTime();
+
+        sv.log("TIME HASH: " + JSON.stringify(timeHash));
 
         //Controls
         //currently is being set larger than it should be
