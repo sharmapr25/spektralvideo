@@ -45,20 +45,10 @@ function SpektralVideo(container, instanceID, params) {
 
         if (autoplay === true) {
         	videoElement.autoplay = true;
-        	//videoElement.load();
-        	if (sv.getReadyState() === "noInfo") {
-        		autoplayTimer = createTimer(0.25, waitForData);
-        	}
-        	//sv.log("AUTOPLAY: READY STATE: " + sv.getReadyState());
-        }
-
-        function waitForData() {
-        	if (sv.getReadyState() === "haveEnough") {
-        		clearTimer(autoplayTimer);
+        	readyToPlay(function() {
         		sv.play();
-        	}
-    	}
-
+        	});
+        }
         //sv.log("loadFile: path: " + pathType);
     }
 
@@ -99,29 +89,15 @@ function SpektralVideo(container, instanceID, params) {
         //If time is more than 0, 
         //seek to that part and play.
         if (time === 0) {
-            videoElement.play();
+        	readyToPlay(function() {
+        		videoElement.play();
+        	});
         } else {
-            sv.seek(time);
-            videoElement.play();
+        	readyToPlay(function() {
+        		sv.seek(time);
+            	videoElement.play();	
+        	});
         }
-
-        //If the videos ready state is noInfo, 
-        //setup a timer to listen until video 
-        //is ready.
-        if (sv.getReadyState() === "noInfo") {
-        	pTimer = createTimer(0.25, canPlay);
-        }
-
-        //Check videos ready state to 
-        //see if it's ready to play
-        function canPlay() {
-        	if (sv.getReadyState() === "haveEnough") {
-        		clearTimer(pTimer);
-        		sv.play();
-        	}
-        }
-
-        //attachEventListener(videoElement, "progress", onAmountLoaded);
 
         playbackState = "playing";
     }
@@ -213,10 +189,11 @@ function SpektralVideo(container, instanceID, params) {
     ///////////////////////
     ////SEEK AND PLAY
     //////////////////////
-    sv.seekAndPlay = function (time) {
-    	sv.log("seekAndPlay: readyState: " + sv.getReadyState());
-    	sv.seek(time);
-    	sv.play();
+    sv.seekAndPlay = function (time) {	
+    	readyToPlay(function() {
+    		sv.play();
+    		sv.seek(time);
+    	});
     }
 
     ///////////////////////
@@ -357,21 +334,16 @@ function SpektralVideo(container, instanceID, params) {
     	loopVideo = loopVideo || false;
     	var 
     		timeChecker,
-    		endSeconds = sv.formatTime(end).secondsNum,
-    		readyCheck = createTimer(0.25, onReadyCheck);
+    		endSeconds = sv.formatTime(end).secondsNum;
     	sv.log("playSection: start: " + start + " end: " + end);
 
-    	function onReadyCheck() {
-    		if (sv.getReadyState() === "haveEnough") {
-        		clearTimer(readyCheck);
-        		sv.seekAndPlay(start);
-        		timeChecker = createTimer(0.25, onTimeCheck);
-        		if (loopVideo === true) {
-        			sv.loop();
-        		}
-        		sv.log("playSection: videoReady")
-        	}
-    	}
+    	readyToPlay(function() {
+    		sv.seekAndPlay(start);
+    		timeChecker = createTimer(0.25, onTimeCheck);
+    		if (loopVideo === true) {
+    			sv.loop();
+    		}
+    	});
 
     	function onTimeCheck() {
     		if (sv.getCurrentTime() >= endSeconds) {
@@ -992,6 +964,20 @@ function SpektralVideo(container, instanceID, params) {
     }
 
     ///////////////////////
+    ////READY TO PLAY
+    //////////////////////
+    function readyToPlay(handler) {
+    	var readyCheck = createTimer(0.25, onReadyCheck);
+
+    	function onReadyCheck(evt) {
+    		if (sv.getReadyState() === "haveEnough") {
+    			clearTimer(readyCheck);
+    			handler();
+    		}
+    	}	
+    }
+
+    ///////////////////////
     ////ON PLAYBACK COMPLETE
     //////////////////////
     function onPlaybackComplete() {
@@ -1410,8 +1396,7 @@ function SpektralVideo(container, instanceID, params) {
     				sv.playSection(range[0], range[1]);
     			} else {
     				//single
-    				//Have to fix
-    				//sv.seekAndPlay(timeValue);
+    				sv.seekAndPlay(timeValue);
     			}
 
     			sv.log("hasComma: " + hasComma);
