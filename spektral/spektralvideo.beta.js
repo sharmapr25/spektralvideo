@@ -629,7 +629,7 @@ function SpektralVideo(container, instanceID, params) {
     ////ON VIDEO COMPLETE
     //////////////////////
     sv.onVideoComplete = function (handler) {
-    	attachEventListener(videoElement, "PlaybackComplete", handler);
+    	attachEventListener(videoElement, "playbackcomplete", handler);
     }
 
     sv.attachVideoEvent = function (evt, handler) {
@@ -1398,9 +1398,6 @@ function SpektralVideo(container, instanceID, params) {
     				//single
     				sv.seekAndPlay(timeValue);
     			}
-
-    			sv.log("hasComma: " + hasComma);
-
     		} else {
     			timeObj = false;
     		}
@@ -1458,8 +1455,6 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     function initVideo() {
 
-    	var timeHash;
-
     	possibleFormats = {
     		"ogg" : "theora, vorbis",
     		"mp4" : "avc1.4D401E, mp4a.40.2",
@@ -1478,13 +1473,11 @@ function SpektralVideo(container, instanceID, params) {
         sv.attachVideoEvent("error", onVideoError);
 
         //PlaybackComplete
-        playbackComplete = createEvent("PlaybackComplete");
-        attachEventListener(videoElement, "PlaybackComplete", onPlaybackComplete);
+        playbackComplete = createEvent("playbackcomplete");
+        attachEventListener(videoElement, "playbackcomplete", onPlaybackComplete);
 
         //Check for time in hash
-        timeHash = checkHashForTime();
-
-        sv.log("TIME HASH: " + JSON.stringify(timeHash));
+        checkHashForTime();
 
         //Controls
         //currently is being set larger than it should be

@@ -54,6 +54,8 @@ $(document).ready (function(){
     //Load multiple formats
     theVideo.loadFile(vidPathObj);
 
+    theVideo.attachVideoEvent("playing", onPlaybackStart);
+
     theVideo.onVideoComplete(onPlaybackComplete);
 
     //////////////////
@@ -319,10 +321,19 @@ $(document).ready (function(){
     }
 
     ////////////////////
+    ////ON PLAYBACK START
+    /////////////////////
+    function onPlaybackStart(evt) {
+        startPBTimer();
+        setSliderValue();
+        console.log("Playback Start");
+    }
+
+    ////////////////////
     ////ON PLAYBACK COMPLETE
     /////////////////////
     function onPlaybackComplete(evt) {
-        console.log("PLAYBACK COMPLETE!!!: " + evt.target);
+        console.log("Playback Complete: " + evt.target);
     }
 
     //HELPERS
