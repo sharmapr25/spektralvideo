@@ -335,9 +335,9 @@ function SpektralVideo(container, instanceID, params) {
     	var 
     		timeChecker,
     		endSeconds = sv.formatTime(end).secondsNum;
-    	sv.log("playSection: start: " + start + " end: " + end);
 
     	readyToPlay(function() {
+    		sv.log("playSection: readyToPlay");
     		sv.seekAndPlay(start);
     		timeChecker = createTimer(0.25, onTimeCheck);
     		if (loopVideo === true) {
@@ -1372,47 +1372,25 @@ function SpektralVideo(container, instanceID, params) {
     ////CHECK HASH FOR TIME
     ////////////////////
     function checkHashForTime() {
-    	//This can be simplified, which I'll do once I get it working
+    	
     	var 
-    		hashTag = getHash(),
-    		timeValue, range,
-    		hashDetected = false,
-    		hasTime, timeType, hasComma,
-    		timeDetected = false,
-    		timeObj = {}, i;
-    	if (hashTag !== false) {
-    		//hash is present, check for time
-    		hashDetected = true;
-    		hasTime = hasPattern(hashTag, "t=");
-    		if (hasTime.match === true) {
-    			//time detected!!!
-    			//check if range or single time
-    			timeValue = getHashValue("t");
-    			hasComma = detectCharacter(timeValue, ",");
-    			if (hasComma === true) {
-    				//range
-    				range = splitString(timeValue, ",");
-    				//figure out loop
-    				sv.playSection(range[0], range[1]);
-    			} else {
-    				//single
-    				sv.seekAndPlay(timeValue);
-    			}
-    		} else {
-    			timeObj = false;
-    		}
-    		
-    	} else {
-    		timeObj = false;
-    	}
-
-    	if (getType(timeObj) === "object") {
-    		sv.log("checkHashForTime: timeObj: " + JSON.stringify(timeObj));
-    	} else {
-    		sv.log("checkHashForTime: timeObj: " + timeObj);
-    	}
-
-    	return timeObj;
+    		timeValue = getHashValue("t"), 
+    		range, hasComma;
+    
+		if (timeValue !== false) {
+			//time detected
+			//check if range or single time
+			hasComma = detectCharacter(timeValue, ",");
+			if (hasComma === true) {
+				//range
+				range = splitString(timeValue, ",");
+				//figure out loop
+				sv.playSection(range[0], range[1]);
+			} else {
+				//single
+				sv.seekAndPlay(timeValue);
+			}
+		}		
     }
 
     //INITIALIZE THE VIDEO**************************************************************
