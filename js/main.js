@@ -59,6 +59,8 @@ $(document).ready (function(){
 
     theVideo.onVideoComplete(onPlaybackComplete);
 
+    theVideo.convertToSeconds("8:0");
+
     //////////////////
     ////CONTROL BUTTONS
     //////////////////

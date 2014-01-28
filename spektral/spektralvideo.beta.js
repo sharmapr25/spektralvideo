@@ -155,7 +155,6 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.seek = function (time) {
 
-    	sv.log("seek");
     	var 
     		detectColon = matchPattern(time.toString(), ":"),
     		detected = detectColon.isMatch, 
@@ -336,10 +335,14 @@ function SpektralVideo(container, instanceID, params) {
     		timeChecker, startTime = start,
     		endTime = end;
 
-    	readyToPlay(function() {
-    		sv.seekAndPlay(startTime);
-    		timeChecker = createTimer(0.25, onTimeCheck);
-    	});
+    	if (endTime > startTime) {
+    		readyToPlay(function() {
+	    		sv.seekAndPlay(startTime);
+	    		timeChecker = createTimer(0.25, onTimeCheck);
+    		});
+    	} else {
+    		sv.log("playSection: end time must be greater than start time.", "warn");
+    	}	
 
     	function onTimeCheck() {
     		//If playbackState changes from playing
@@ -362,10 +365,14 @@ function SpektralVideo(container, instanceID, params) {
     		timeChecker, startTime = start,
     		endTime = end;
 
-    	readyToPlay(function() {
-    		sv.seekAndPlay(startTime);
-    		timeChecker = createTimer(0.25, onTimeCheck);
-    	});
+    	if (endTime > startTime) {
+    		readyToPlay(function() {
+	    		sv.seekAndPlay(startTime);
+	    		timeChecker = createTimer(0.25, onTimeCheck);
+    		});
+    	} else {
+    		sv.log("loopSection: end time must be greater than start time.", "warn");
+    	}	
 
     	function onTimeCheck() {
     		//If playbackState changes from playing
@@ -714,6 +721,27 @@ function SpektralVideo(container, instanceID, params) {
     }
 
     //////////////////////
+    ////CONVERT TO SECONDS
+    //////////////////////
+    sv.convertToSeconds = function (formattedTime) {
+    	var 
+    		fTimeType = getType(formattedTime), 
+    		convertedSeconds, colonCheck;
+
+    	if (fTimeType === "number") {
+    		convertedSeconds = formattedTime;
+    	} else {
+    		colonCheck = hasPattern(formattedTime, ":");
+    		sv.log("colonCheck: match: " + colonCheck.match);
+    		sv.log("colonCheck: matchAmount: " + colonCheck.matchAmount);
+    		sv.log("colonCheck: matches: " + colonCheck.matches);
+    	}	
+
+    	//sv.log("fTimeType: " + fTimeType);	
+    	return convertedSeconds;
+    }
+
+    //////////////////////
     ////FORMAT TIME
     //////////////////////
     sv.formatTime = function (time, id) {
@@ -727,11 +755,7 @@ function SpektralVideo(container, instanceID, params) {
 
 	    if (seconds < 10) {
 	    	secondsString = "0" + secondsString;
-	    }   
-
-	    if (id === "playSection") {
-	    	sv.log("formatTime: seconds: " + seconds);
-	    } 
+	    }  
 
 	    formattedTime["hours"] = hours.toString();
 	    formattedTime["minutes"] = minutes.toString();
@@ -1183,30 +1207,6 @@ function SpektralVideo(container, instanceID, params) {
     }
 
     //////////////////
-    ////MATCH PATTERN
-    //////////////////
-    function matchPattern(request, pattern) {
-
-        var 
-            regEx = new RegExp(pattern, "g"),
-            matches = request.match(regEx),
-            isMatch = false, matchAmount = 0,
-            matchObj = {}, i;
-
-        if (matches !== null && pattern !== undefined) {
-
-            isMatch = true;
-            matchAmount = matches.length;
-        }
-
-        matchObj["isMatch"] = isMatch;
-        matchObj["amount"] = matchAmount;
-        matchObj["matches"] = matches;
-
-        return matchObj;
-    }
-
-    //////////////////
     ////SPLIT STRING
     //////////////////
     function splitString(request, character) {
@@ -1404,6 +1404,30 @@ function SpektralVideo(container, instanceID, params) {
         return matchObj;
     }
 
+    //////////////////
+    ////MATCH PATTERN
+    //////////////////
+    function matchPattern(request, pattern) {
+
+        var 
+            regEx = new RegExp(pattern, "g"),
+            matches = request.match(regEx),
+            isMatch = false, matchAmount = 0,
+            matchObj = {}, i;
+
+        if (matches !== null && pattern !== undefined) {
+
+            isMatch = true;
+            matchAmount = matches.length;
+        }
+
+        matchObj["isMatch"] = isMatch;
+        matchObj["amount"] = matchAmount;
+        matchObj["matches"] = matches;
+
+        return matchObj;
+    }
+
     ////////////////////
     ////CHECK HASH FOR TIME
     ////////////////////
@@ -1412,7 +1436,6 @@ function SpektralVideo(container, instanceID, params) {
     	var 
     		timeValue = getHashValue("t"), 
     		loopValue = getHashValue("loop"),
-    		hasLoop = false,
     		range, hasComma;
 		if (timeValue !== false) {
 			//time detected
@@ -1422,9 +1445,10 @@ function SpektralVideo(container, instanceID, params) {
 				//range
 				range = splitString(timeValue, ",");
 				if (loopValue === "true") {
-					hasLoop = true;
+					sv.loopSection(range[0], range[1]);
+				} else {
+					sv.playSection(range[0], range[1]);
 				}
-				sv.playSection(range[0], range[1], hasLoop);
 			
 			} else {
 				//single
