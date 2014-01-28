@@ -8,7 +8,7 @@ function SpektralVideo(container, instanceID, params) {
         sv = this,
         container, path, width, height, useDefaultControls, videoMuted, videoClass,
         debug = false, strictError = false, videoElement, currentPlaybackSpeed = 1,
- 		playbackState = "stopped", muteState = "unmuted",
+ 		playbackState = "stopped", muteState = "unmuted", videoLooped = false,
         rewindTimer, rewindTimerStarted = false,  rewindRate = 0,
         playbackTimer, playbackComplete, possibleFormats, poster;
 
@@ -136,6 +136,7 @@ function SpektralVideo(container, instanceID, params) {
         } else {
             sv.unloadVideo();
         }
+        videoLooped = false;
         playbackState = "stopped";
     }
 
@@ -154,6 +155,7 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.seek = function (time) {
 
+    	sv.log("seek");
     	var 
     		detectColon = matchPattern(time.toString(), ":"),
     		detected = detectColon.isMatch, 
@@ -191,8 +193,8 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.seekAndPlay = function (time) {	
     	readyToPlay(function() {
-    		sv.play();
     		sv.seek(time);
+    		sv.play();
     	});
     }
 
@@ -328,40 +330,66 @@ function SpektralVideo(container, instanceID, params) {
     ///////////////////////
     ////PLAY SECTION
     //////////////////////
-    sv.playSection = function (start, end, loopVideo) {
+    sv.playSection = function (start, end) {
 
-    	sv.log("playSection: start: " + start + " end: " + end);
-    	loopVideo = loopVideo || false;
     	var 
-    		timeChecker,
-    		endSeconds = sv.formatTime(end).secondsNum;
+    		timeChecker, startTime = start,
+    		endTime = end;
 
     	readyToPlay(function() {
-    		sv.log("playSection: readyToPlay");
-    		sv.seekAndPlay(start);
+    		sv.seekAndPlay(startTime);
     		timeChecker = createTimer(0.25, onTimeCheck);
-    		if (loopVideo === true) {
-    			sv.loop();
-    		}
     	});
 
     	function onTimeCheck() {
-    		if (sv.getCurrentTime() >= endSeconds) {
-    			//If at end of section
-    			if (videoElement.loop === true) {
-    				//If looping, restart 
-    				//video at start point
-    				sv.seekAndPlay(start);
-    				sv.log("playSection: looping")
-    			} else {
-    				//If loop is false, 
-    				//clearTimer and stop playback
-    				sv.stop();
-    				clearTimer(timeChecker);
-    				sv.log("playSection: stop")
-    			}
+    		//If playbackState changes from playing
+    		//as a result of user interaction, clear timeChecker
+    		if(playbackState !== "playing") {
+    			clearTimer(timeChecker);
+    		} else {
+    			if (sv.getCurrentTime() >= endTime) {	
+	    			sv.stop();	
+	    		}
     		}
-    		//sv.log("time checker");
+    	}
+    }
+
+    ///////////////////////
+    ////LOOP SECTION
+    //////////////////////
+    sv.loopSection = function (start, end) {
+    	var 
+    		timeChecker, startTime = start,
+    		endTime = end;
+
+    	readyToPlay(function() {
+    		sv.seekAndPlay(startTime);
+    		timeChecker = createTimer(0.25, onTimeCheck);
+    	});
+
+    	function onTimeCheck() {
+    		//If playbackState changes from playing
+    		//as a result of user interaction, clear timeChecker
+    		if(playbackState !== "playing") {
+    			clearTimer(timeChecker);
+    		} else {
+    			if (sv.getCurrentTime() >= endTime) {	
+	    			clearTimer(timeChecker);
+	    			sv.loopSection(startTime, endTime);
+	    		}
+    		}
+    	}
+    	videoLooped = true;
+    }
+
+    ///////////////////////
+    ////TOGGLE LOOP
+    //////////////////////
+    sv.toggleLoop = function () {
+    	if (videoLooped === false) {
+    		sv.loop();
+    	} else {
+    		sv.unloop();
     	}
     }
 
@@ -369,19 +397,23 @@ function SpektralVideo(container, instanceID, params) {
     ////LOOP
     //////////////////////
     sv.loop = function () {
-    	//Toggles the video looping
-    	if (videoElement.loop === false) {
-    		videoElement.loop = true;
-    	} else {
-    		videoElement.loop = false;
-    	}
+    	videoElement.loop = true;
+    	videoLooped = true;
+    }
+
+    ///////////////////////
+    ////UNLOOP
+    //////////////////////
+    sv.unloop = function() {
+    	videoElement.loop = false;
+    	videoLooped = false;
     }
 
     ///////////////////////
     ////IS LOOPED
     //////////////////////
     sv.isLooped = function () {
-    	return videoElement.loop;
+    	return videoLooped;
     }
 
     ///////////////////////
@@ -684,18 +716,22 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     ////FORMAT TIME
     //////////////////////
-    sv.formatTime = function (time) {
+    sv.formatTime = function (time, id) {
         var 
         	formattedTime = {}, 
 	        hours = Math.floor(time / (60 * 60)), 
 	        minDivisor = time % (60 * 60)
 	        minutes = Math.floor(minDivisor / 60),
-	        seconds = Math.ceil(minDivisor % 60),
+	        seconds = Math.floor(minDivisor % 60),
 	        secondsString = seconds.toString();
 
 	    if (seconds < 10) {
 	    	secondsString = "0" + secondsString;
-	    }    
+	    }   
+
+	    if (id === "playSection") {
+	    	sv.log("formatTime: seconds: " + seconds);
+	    } 
 
 	    formattedTime["hours"] = hours.toString();
 	    formattedTime["minutes"] = minutes.toString();
@@ -1375,8 +1411,9 @@ function SpektralVideo(container, instanceID, params) {
     	
     	var 
     		timeValue = getHashValue("t"), 
+    		loopValue = getHashValue("loop"),
+    		hasLoop = false,
     		range, hasComma;
-    
 		if (timeValue !== false) {
 			//time detected
 			//check if range or single time
@@ -1384,8 +1421,11 @@ function SpektralVideo(container, instanceID, params) {
 			if (hasComma === true) {
 				//range
 				range = splitString(timeValue, ",");
-				//figure out loop
-				sv.playSection(range[0], range[1]);
+				if (loopValue === "true") {
+					hasLoop = true;
+				}
+				sv.playSection(range[0], range[1], hasLoop);
+			
 			} else {
 				//single
 				sv.seekAndPlay(timeValue);

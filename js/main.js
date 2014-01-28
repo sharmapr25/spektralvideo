@@ -6,7 +6,7 @@ $(document).ready (function(){
         runningTime = "", pbTimer = false,
         sliderTimer = false, isDragging = false,
         sliderValue = 0, useScrub = false,
-        videoLooped = false, videoMuted,
+        videoMuted,
         playbackState = "stopped", networkStatus, supportedFormat,
         amountLoaded = 0, sizeButtonArray, sizeButton, j, k,
         controlButtonArray, controlButton,
@@ -33,6 +33,7 @@ $(document).ready (function(){
         startField = document.getElementById("startField"),
         endField = document.getElementById("endField"),
         playSectionButton = document.getElementById("playSectionButton"),
+        loopSectionButton = document.getElementById("loopSectionButton"),
         sizeButtonContainer = document.getElementById("sizeButtonContainer");
 
     //Object containing multiple formats of the same video
@@ -87,6 +88,7 @@ $(document).ready (function(){
     attachEventListener(widthButton, "click", onButtonClick);
     attachEventListener(heightButton, "click", onButtonClick);
     attachEventListener(playSectionButton, "click", onButtonClick);
+    attachEventListener(loopSectionButton, "click", onButtonClick);
 
     //To clear fields on focus
     attachEventListener(volField, "click", onFieldFocus);
@@ -105,16 +107,12 @@ $(document).ready (function(){
 
         if(name === "play") {
             theVideo.play({"regularSpeed" : true});
-            setSliderValue();
-            startPBTimer();
         } else if (name === "pause") {
             theVideo.pause();
         } else if (name === "togglePause") {
             theVideo.togglePause();
         } else if (name === "stop") {
             theVideo.stop();
-            stopSliderTimer();
-            stopPBTimer();
             timeDisplay.innerHTML = "0:00 / 0:00";
         } else if (name === "mute") {
             theVideo.mute();
@@ -146,12 +144,8 @@ $(document).ready (function(){
             theVideo.rewind(true);
         } else if (name === "loop") {
             theVideo.loop();
-            videoLooped = theVideo.isLooped();
-            if (videoLooped === true) {
-                loopDisplay.innerHTML = "true";
-            } else {
-                loopDisplay.innerHTML = "false";
-            }
+        } else if (name === "unloop") {
+            theVideo.unloop();
         } else if (name === "scrub") {
             if (useScrub === true) {
                 useScrub = false;
@@ -188,6 +182,8 @@ $(document).ready (function(){
             theVideo.enterFullscreen();
         } else if (name === "playSection") {
             theVideo.playSection(startField.value, endField.value);
+        } else if (name === "loopSection") {
+            theVideo.loopSection(startField.value, endField.value);
         }
     }
 
@@ -316,6 +312,8 @@ $(document).ready (function(){
 
         videoMuted = theVideo.isMuted();
         muteDisplay.innerHTML = videoMuted;
+
+        loopDisplay.innerHTML = theVideo.isLooped();
 
         setVideoSize();
     }
