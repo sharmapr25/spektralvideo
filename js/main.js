@@ -57,6 +57,8 @@ $(document).ready (function(){
 
     theVideo.setSubtitles("video/bigbuckbunny/bigbuckbunny.vtt", "Closed Captioning", "En", true);
 
+    theVideo.getSubtitles();
+
     theVideo.attachVideoEvent("playing", onPlaybackStart);
 
     theVideo.onVideoComplete(onPlaybackComplete);

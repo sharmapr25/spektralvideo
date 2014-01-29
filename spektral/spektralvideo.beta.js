@@ -477,6 +477,35 @@ function SpektralVideo(container, instanceID, params) {
     }
 
     ///////////////////////
+    ////GET SUBTITLES
+    //////////////////////
+    sv.getSubtitles = function () {
+
+  		var 
+			trackElements = videoElement.querySelectorAll("track"), i, j,
+			textTrack, isSubtitles, cue;
+
+		for (i = 0; i < trackElements.length; i += 1) {
+			attachEventListener(trackElements[i], "load", onSubtitleLoaded);
+			sv.log("attaching load to subs");
+			sv.log("trackElements[i]: " + trackElements[i].src);
+		}	
+
+
+
+		function onSubtitleLoaded(evt) {
+			sv.log("onSubtitleLoaded");
+			textTrack = this.track;
+			isSubtitles = textTrack === "subtitles";
+
+			for (j = 0; j < textTrack.cues.length; j += 1) {
+				cue = textTrack.cues[j];
+				sv.log("cue: " + cue);
+			}
+		}
+	}
+
+    ///////////////////////
     ////SET SIZE
     //////////////////////
     sv.setSize =  function (sizeParams) {
