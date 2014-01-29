@@ -55,11 +55,11 @@ $(document).ready (function(){
     //Load multiple formats
     theVideo.loadFile(vidPathObj);
 
+    theVideo.setSubtitles("video/bigbuckbunny/bigbuckbunny.vtt", "Closed Captioning", "En", true);
+
     theVideo.attachVideoEvent("playing", onPlaybackStart);
 
     theVideo.onVideoComplete(onPlaybackComplete);
-
-    theVideo.convertToSeconds("1:25:35");
 
     //////////////////
     ////CONTROL BUTTONS

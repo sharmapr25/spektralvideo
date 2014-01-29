@@ -457,6 +457,26 @@ function SpektralVideo(container, instanceID, params) {
     }
 
     ///////////////////////
+    ////SET SUBTITLES
+    //////////////////////
+    sv.setSubtitles = function (subUrl, label, sourceLang, isDefault) {
+    	
+    	//label, source, sourceLang, isDefault
+    	isDefault = isDefault || false;
+
+    	sv.log("setSubtitles: isDefault: " + isDefault);
+
+    	var 
+    		subUrlType = getType(subUrl);
+
+    	if (subUrlType === "string") {
+    		createTrackElement(label, subUrl, sourceLang, isDefault);
+    	} else {
+
+    	}
+    }
+
+    ///////////////////////
     ////SET SIZE
     //////////////////////
     sv.setSize =  function (sizeParams) {
@@ -976,6 +996,24 @@ function SpektralVideo(container, instanceID, params) {
     }
 
     ///////////////////////
+    ////CREATE TRACK ELEMENT
+    //////////////////////
+    function createTrackElement(label, source, sourceLang, isDefault) {
+    	
+    	var trackElem = document.createElement("track");
+    	createSetAttribute(trackElem, "kind", "subtitles");
+    	createSetAttribute(trackElem, "label", label);
+    	createSetAttribute(trackElem, "src", source);
+    	createSetAttribute(trackElem, "srclang", sourceLang);
+
+    	if (isDefault === true) {
+    		createSetAttribute(trackElem, "default", "");
+    	}
+    	videoElement.appendChild(trackElem);
+    	sv.log("createTrackElement");
+    }
+
+    ///////////////////////
     ////ON LOADED META DATA
     //////////////////////
     function onLoadedMetaData(evt) {
@@ -1471,8 +1509,9 @@ function SpektralVideo(container, instanceID, params) {
             " width: " + width + 
             " height: " + height + 
             " useDefaultControls: " + useDefaultControls + 
-            "videoMuted: " + videoMuted +
-            "videoClass" + videoClass);
+            " videoMuted: " + videoMuted +
+            " videoClass" + videoClass +
+            " poster" + poster);
 
     initVideo();
 
