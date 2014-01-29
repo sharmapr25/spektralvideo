@@ -65,7 +65,7 @@ function SpektralVideo(container, instanceID, params) {
     	//should be restored to 1
     	var 
     		rSpeed = getParameter(playParams, "regularSpeed", true);
-    		time = getParameter(playParams, "time", 0), 
+    		time = sv.convertToSeconds(getParameter(playParams, "time", 0)), 
     		pTimer = false;
 
 		//If playback timer hasn't been started, start it	
@@ -155,34 +155,14 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.seek = function (time) {
 
-    	var 
-    		detectColon = matchPattern(time.toString(), ":"),
-    		detected = detectColon.isMatch, 
-    		matchArray, h, m, s,
-    		detectedAmount = detectColon.amount, i;
+    	var seekTime = sv.convertToSeconds(time);
 
-    	//Check if time is formatted,
-    	//either m:s or h:m:s
-    	if (detected === true) {
-    		matchArray = splitString(time, ":");
-    		if (detectedAmount === 1) {
-    			m = parseInt(matchArray[0]) * 60;
-    			s = parseInt(matchArray[1]);
-    			time = m + s;
-    		} else {
-    			h = (parseInt(matchArray[0]) * 60) * 60;
-    			m = parseInt(matchArray[1]) * 60;
-    			s = parseInt(matchArray[2]);
-    			time = h + m + s;  
-    		}
-    	}	
-
-        if (time > sv.getTotalTime) {
+        if (seekTime > sv.getTotalTime) {
             videoElement.currentTime = sv.getTotalTime;
         } else if (time <= 0)
         	videoElement.currentTime = 0;
         else {
-            videoElement.currentTime = time;
+            videoElement.currentTime = seekTime;
         }
         playbackState = "seeking";
     }
@@ -191,8 +171,10 @@ function SpektralVideo(container, instanceID, params) {
     ////SEEK AND PLAY
     //////////////////////
     sv.seekAndPlay = function (time) {	
+
+    	var seekTime = sv.convertToSeconds(time);
     	readyToPlay(function() {
-    		sv.seek(time);
+    		sv.seek(seekTime);
     		sv.play();
     	});
     }
@@ -332,8 +314,10 @@ function SpektralVideo(container, instanceID, params) {
     sv.playSection = function (start, end) {
 
     	var 
-    		timeChecker, startTime = start,
-    		endTime = end;
+    		timeChecker, startTime = sv.convertToSeconds(start),
+    		endTime = sv.convertToSeconds(end);
+
+    	sv.log("startTime: " + startTime + " endTime: " + endTime);	
 
     	if (endTime > startTime) {
     		readyToPlay(function() {
@@ -362,8 +346,8 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.loopSection = function (start, end) {
     	var 
-    		timeChecker, startTime = start,
-    		endTime = end;
+    		timeChecker, startTime = sv.convertToSeconds(start),
+    		endTime = sv.convertToSeconds(end);
 
     	if (endTime > startTime) {
     		readyToPlay(function() {
@@ -726,18 +710,37 @@ function SpektralVideo(container, instanceID, params) {
     sv.convertToSeconds = function (formattedTime) {
     	var 
     		fTimeType = getType(formattedTime), 
-    		convertedSeconds, colonCheck;
+    		convertedSeconds, colonCheck,
+    		minuteToSec, hourToSec, 
+    		hour, minute, second, mArray;
 
     	if (fTimeType === "number") {
     		convertedSeconds = formattedTime;
     	} else {
-    		colonCheck = hasPattern(formattedTime, ":");
-    		sv.log("colonCheck: match: " + colonCheck.match);
-    		sv.log("colonCheck: matchAmount: " + colonCheck.matchAmount);
-    		sv.log("colonCheck: matches: " + colonCheck.matches);
-    	}	
+    		colonCheck = matchPattern(formattedTime, ":");
+    		if (colonCheck.isMatch === false) {
+    			convertedSeconds = parseInt(formattedTime);
+    		} else {
+    			mArray = colonCheck.matchArray;
+    			if (colonCheck.amount === 1) {
+    				//M:S
+    				minute = parseInt(mArray[0]);
+    				second = parseInt(mArray[1]);
 
-    	//sv.log("fTimeType: " + fTimeType);	
+    				minuteToSec = minute * 60;
+    				convertedSeconds = minuteToSec + second;
+    			} else {
+					//H:M:S
+					hour = parseInt(mArray[0]);
+					minute = parseInt(mArray[1]);
+					second = parseInt(mArray[2]);
+
+					hourToSec = (hour * 60) * 60;
+					minuteToSec = minute * 60;
+					convertedSeconds = hourToSec + minuteToSec + second;
+    			}
+    		}
+    	}	
     	return convertedSeconds;
     }
 
@@ -1385,26 +1388,6 @@ function SpektralVideo(container, instanceID, params) {
     }
 
     //////////////////
-    ////HAS PATTERN
-    //////////////////
-    function hasPattern(request, pattern) {
-        var 
-            regEx = new RegExp(pattern, "g"),
-            matches = request.match(regEx),
-            hasMatch = false, matchAmount = 0,
-            matchObj = {}, i;
-        if (matches !== null) {
-            hasMatch = true;
-            matchAmount = matches.length;
-        }
-        matchObj["match"] = hasMatch;
-        matchObj["amount"] = matchAmount;
-        matchObj["matchArray"] = matches;
-        //sv.log("matchObj: " + JSON.stringify(matchObj));
-        return matchObj;
-    }
-
-    //////////////////
     ////MATCH PATTERN
     //////////////////
     function matchPattern(request, pattern) {
@@ -1412,6 +1395,7 @@ function SpektralVideo(container, instanceID, params) {
         var 
             regEx = new RegExp(pattern, "g"),
             matches = request.match(regEx),
+            matchArray = request.split(pattern),
             isMatch = false, matchAmount = 0,
             matchObj = {}, i;
 
@@ -1423,7 +1407,7 @@ function SpektralVideo(container, instanceID, params) {
 
         matchObj["isMatch"] = isMatch;
         matchObj["amount"] = matchAmount;
-        matchObj["matches"] = matches;
+        matchObj["matchArray"] = matchArray;
 
         return matchObj;
     }
@@ -1454,7 +1438,7 @@ function SpektralVideo(container, instanceID, params) {
 				//single
 				sv.seekAndPlay(timeValue);
 			}
-		}		
+		}	
     }
 
     //INITIALIZE THE VIDEO**************************************************************

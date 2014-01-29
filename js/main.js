@@ -59,7 +59,7 @@ $(document).ready (function(){
 
     theVideo.onVideoComplete(onPlaybackComplete);
 
-    theVideo.convertToSeconds("8:0");
+    theVideo.convertToSeconds("1:25:35");
 
     //////////////////
     ////CONTROL BUTTONS
