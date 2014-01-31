@@ -6,7 +6,7 @@ function SpektralVideo(container, instanceID, params) {
     //Private Vars
     var 
         sv = this,
-        container, path, width, height, useDefaultControls, videoMuted, videoClass,
+        container, path, width, height, useDefaultControls, videoMuted, videoClass, autoplayVideo,
         debug = false, strictError = false, videoElement, currentPlaybackSpeed = 1,
  		playbackState = "stopped", muteState = "unmuted", videoLooped = false,
         rewindTimer, rewindTimerStarted = false,  rewindRate = 0,
@@ -22,10 +22,9 @@ function SpektralVideo(container, instanceID, params) {
     ///////////////////////
     ////LOAD FILE
     //////////////////////
-    sv.loadFile = function (newPath, autoplay, preload) {
+    sv.loadFile = function (newPath, autoplay) {
 
         autoplay = autoplay || false;
-        preload = 25;
 
         var 
             pathType = getType(newPath),
@@ -50,6 +49,15 @@ function SpektralVideo(container, instanceID, params) {
         	});
         }
         //sv.log("loadFile: path: " + pathType);
+    }
+
+    ///////////////////////
+    ////PRELOAD VIDEO
+    //////////////////////
+    sv.preloadVideo = function (preloadValue) {
+    	//options - none, auto, metadata
+    	preloadValue = preloadValue || "auto";
+    	createSetAttribute(videoElement, "preload", preloadValue);
     }
 
     ///////////////////////
@@ -617,6 +625,7 @@ function SpektralVideo(container, instanceID, params) {
     		createSetAttribute(screenShotImg, "src", dataURI);
     		container.appendChild(screenShotImg);
     	}
+    	return dataURI;
     }
 
     ///////////////////////
@@ -1556,6 +1565,7 @@ function SpektralVideo(container, instanceID, params) {
     videoMuted = getParameter(params, "muted", false);
     videoClass = getParameter(params, "class", false);
     poster = getParameter(params, "poster", false);
+    autoplayVideo = getParameter(params, "autoplay", false);
     
     sv.log("params: debug: " + debug + 
             " path: " + path + 
@@ -1563,8 +1573,9 @@ function SpektralVideo(container, instanceID, params) {
             " height: " + height + 
             " useDefaultControls: " + useDefaultControls + 
             " videoMuted: " + videoMuted +
-            " videoClass" + videoClass +
-            " poster" + poster);
+            " videoClass: " + videoClass +
+            " poster: " + poster +
+            " autoplayVideo: " + autoplayVideo);
 
     initVideo();
 
@@ -1597,12 +1608,23 @@ function SpektralVideo(container, instanceID, params) {
         //Check for time in hash
         checkHashForTime();
 
+        //Path
+        if (path !== "none") {
+        	sv.loadFile(path);
+        }
+
         //Controls
         //currently is being set larger than it should be
         if (useDefaultControls === true) {
             createSetAttribute(videoElement, "controls");
         }
 
+        //Autoplay
+        if (autoplayVideo === true) {
+        	createSetAttribute(videoElement, "autoplay");
+        }
+
+        //Mute
         if (videoMuted === true) {
         	sv.mute();
         } 

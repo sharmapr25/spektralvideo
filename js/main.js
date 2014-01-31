@@ -50,6 +50,8 @@ $(document).ready (function(){
         "poster" : "video/bigbuckbunny/BigBuckBunny.png"
     });
 
+    theVideo.preloadVideo();
+
     //Load just the mp4
     //theVideo.loadFile("video/bigbuckbunny/BigBuckBunny_320x180.mp4", false);
 
