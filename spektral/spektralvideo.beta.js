@@ -596,6 +596,30 @@ function SpektralVideo(container, instanceID, params) {
     }
 
     ///////////////////////
+    ////TAKE SNAP SHOT
+    //////////////////////
+    sv.takeSnapShot = function (container, type) {
+    	type = type || "jpeg";
+    	//Maybe have this check if canvas exists, if not make it, etc.
+    	var 
+    		canvas = document.createElement("canvas"),
+    		videoDimensions = sv.getDimensions(), ctx,
+    		dataURI, screenShotImg;
+    	
+    	canvas.width = videoDimensions.width;
+    	canvas.height = videoDimensions.height;
+    	ctx = canvas.getContext("2d");
+    	ctx.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+    	dataURI = canvas.toDataURL("image/" + type);
+
+    	if (container !== undefined) {
+    		screenShotImg = document.createElement("img");
+    		createSetAttribute(screenShotImg, "src", dataURI);
+    		container.appendChild(screenShotImg);
+    	}
+    }
+
+    ///////////////////////
     ////ENTER FULLSCREEN
     //////////////////////
     sv.enterFullscreen = function () {

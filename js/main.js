@@ -11,6 +11,7 @@ $(document).ready (function(){
         amountLoaded = 0, sizeButtonArray, sizeButton, j, k,
         controlButtonArray, controlButton,
         controls = document.getElementById("controlsContainer"),
+        snapShotContainer = document.getElementById("snapShotContainer"),
         timeDisplay = document.getElementById("timeDisplay"),
         playbackDisplay = document.getElementById("playbackDisplay"),
         networkDisplay = document.getElementById("networkDisplay"),
@@ -55,9 +56,10 @@ $(document).ready (function(){
     //Load multiple formats
     theVideo.loadFile(vidPathObj);
 
-    theVideo.setSubtitles("video/bigbuckbunny/bigbuckbunny.vtt", "Closed Captioning", "En", true);
-
-    theVideo.getSubtitles();
+    //Will work on later
+//    theVideo.setSubtitles("video/bigbuckbunny/bigbuckbunny.vtt", "Closed Captioning", "En", true);
+//
+//    theVideo.getSubtitles();
 
     theVideo.attachVideoEvent("playing", onPlaybackStart);
 
@@ -188,6 +190,8 @@ $(document).ready (function(){
             theVideo.playSection(startField.value, endField.value);
         } else if (name === "loopSection") {
             theVideo.loopSection(startField.value, endField.value);
+        } else if (name === "snapshot") {
+            theVideo.takeSnapShot(snapShotContainer);
         }
     }
 
