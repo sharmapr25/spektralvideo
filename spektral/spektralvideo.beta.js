@@ -6,7 +6,8 @@ function SpektralVideo(container, instanceID, params) {
     //Private Vars
     var 
         sv = this,
-        container, path, width, height, useDefaultControls, videoMuted, videoClass, autoplayVideo,
+        container, path, width, height, useDefaultControls, 
+        videoMuted, videoClass, autoplayVideo, preload,
         debug = false, strictError = false, videoElement, currentPlaybackSpeed = 1,
  		playbackState = "stopped", muteState = "unmuted", videoLooped = false,
         rewindTimer, rewindTimerStarted = false,  rewindRate = 0,
@@ -776,13 +777,11 @@ function SpektralVideo(container, instanceID, params) {
     	var 
     		rState = videoElement.readyState,
     		percentage;
- 
-    	if (rState >= 3) {
+    	if (rState >= 1) {
     		percentage = Math.round(videoElement.buffered.end(0) / videoElement.duration * 100);
     	} else { 
     		percentage = 0;
     	}
-
     	return percentage;
     }
 
@@ -968,6 +967,32 @@ function SpektralVideo(container, instanceID, params) {
    		//sv.log("playbackState: " + playbackState);
    		return playbackState;
    	}
+
+   	////////////////////
+    ////USE MEDIA SOURCE
+    ////////////////////
+    sv.useMediaSource = function (file, chunkAmount) {
+    	//WARNING - this feature is experimental 
+    	//and should be used with caution
+    	chunkAmount = chunkAmount || 5;
+
+    	window.MediaSource = window.MediaSource || window.WebKitMediaSource;
+
+    	var mediaSource = new MediaSource(), sourceBuffer;
+
+    	if (window.MediaSource === undefined) {
+    		sv.log("useMediaSource: MediaSource API is not available in this browser.", "warn");
+    	} else {
+    		videoElement.src = window.URL.createObjectURL(mediaSource);
+    		attachEventListener(mediaSource, "sourceopen", onSourceOpen);
+
+    		function onSourceOpen(evt) {
+    			sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="vorbis,vp8"');
+    		}
+    	}
+
+    	sv.log("window.MediaSource: " + window.MediaSource);
+    }
 
     //////////////////
     ////INSERT AFTER
@@ -1174,9 +1199,6 @@ function SpektralVideo(container, instanceID, params) {
     function onVideoError(evt) {
     	sv.log(instanceID + ": an error occurred: " + evt, "warn");
     }
-
-
-
 
 
     //////////////////////
@@ -1566,6 +1588,7 @@ function SpektralVideo(container, instanceID, params) {
     videoClass = getParameter(params, "class", false);
     poster = getParameter(params, "poster", false);
     autoplayVideo = getParameter(params, "autoplay", false);
+    preload = getParameter(params, "preload", "none");
     
     sv.log("params: debug: " + debug + 
             " path: " + path + 
@@ -1575,7 +1598,8 @@ function SpektralVideo(container, instanceID, params) {
             " videoMuted: " + videoMuted +
             " videoClass: " + videoClass +
             " poster: " + poster +
-            " autoplayVideo: " + autoplayVideo);
+            " autoplayVideo: " + autoplayVideo +
+            " preload: " + preload);
 
     initVideo();
 
@@ -1628,6 +1652,11 @@ function SpektralVideo(container, instanceID, params) {
         if (videoMuted === true) {
         	sv.mute();
         } 
+
+        //Preload
+        if (preload !== "none") {
+        	sv.preloadVideo(preload);
+        }
     }
     //console.log("SpektralVideo: " + JSON.stringify(this));
 };

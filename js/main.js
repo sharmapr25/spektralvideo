@@ -3,7 +3,7 @@ $(document).ready (function(){
     var
         vidContainer = document.getElementById("videoContainer"),
         vidPathObj, theVideo, totalTime,
-        runningTime = "", pbTimer = false,
+        runningTime = "", pbTimer = false, loadTimer,
         sliderTimer = false, isDragging = false,
         sliderValue = 0, useScrub = false,
         videoMuted,
@@ -47,16 +47,18 @@ $(document).ready (function(){
         "debug" : true,
         "muted" : true,
         "class" : "videoClass",
-        "poster" : "video/bigbuckbunny/BigBuckBunny.png"
+        "poster" : "video/bigbuckbunny/BigBuckBunny.png",
+        "preload" : "auto"
     });
-
-    theVideo.preloadVideo();
 
     //Load just the mp4
     //theVideo.loadFile("video/bigbuckbunny/BigBuckBunny_320x180.mp4", false);
 
     //Load multiple formats
-    theVideo.loadFile(vidPathObj);
+    //theVideo.loadFile(vidPathObj);
+
+    //Use media source API
+    theVideo.useMediaSource("video/bigbuckbunny/BigBuckBunny_320x180.webm");
 
     //Will work on later
 //    theVideo.setSubtitles("video/bigbuckbunny/bigbuckbunny.vtt", "Closed Captioning", "En", true);
@@ -66,6 +68,8 @@ $(document).ready (function(){
     theVideo.attachVideoEvent("playing", onPlaybackStart);
 
     theVideo.onVideoComplete(onPlaybackComplete);
+
+    loadTimer = setInterval(getPercentLoaded, 250);
 
     //////////////////
     ////CONTROL BUTTONS
@@ -311,8 +315,8 @@ $(document).ready (function(){
         networkStatus = theVideo.getNetworkState();
         networkDisplay.innerHTML = networkStatus;
 
-        amountLoaded = theVideo.getAmountLoaded();
-        loadedDisplay.innerHTML = amountLoaded.toString() + "%";
+//        amountLoaded = theVideo.getAmountLoaded();
+//        loadedDisplay.innerHTML = amountLoaded.toString() + "%";
 
         playbackState = theVideo.getPlaybackState();
         playbackDisplay.innerHTML = playbackState;
@@ -326,6 +330,14 @@ $(document).ready (function(){
         loopDisplay.innerHTML = theVideo.isLooped();
 
         setVideoSize();
+    }
+
+    ////////////////////
+    ////GET PERCENT LOADED
+    /////////////////////
+    function getPercentLoaded() {
+        amountLoaded = theVideo.getAmountLoaded();
+        loadedDisplay.innerHTML = amountLoaded.toString() + "%";
     }
 
     ////////////////////
