@@ -55,15 +55,13 @@ $(document).ready (function(){
     //theVideo.loadFile("video/bigbuckbunny/BigBuckBunny_320x180.mp4", false);
 
     //Load multiple formats
-    //theVideo.loadFile(vidPathObj);
+    theVideo.loadFile(vidPathObj);
 
-    //Use media source API
-    theVideo.useMediaSource("video/bigbuckbunny/BigBuckBunny_320x180.webm");
 
     //Will work on later
-//    theVideo.setSubtitles("video/bigbuckbunny/bigbuckbunny.vtt", "Closed Captioning", "En", true);
-//
-//    theVideo.getSubtitles();
+    //theVideo.setSubtitles("video/bigbuckbunny/bigbuckbunny.vtt", "Closed Captioning", "En", true);
+
+    //theVideo.getSubtitles();
 
     theVideo.attachVideoEvent("playing", onPlaybackStart);
 

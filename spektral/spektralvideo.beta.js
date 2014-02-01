@@ -964,51 +964,42 @@ function SpektralVideo(container, instanceID, params) {
     ////GET PLAYBACK STATE
     //////////////////////
    	sv.getPlaybackState = function () {
-   		//sv.log("playbackState: " + playbackState);
    		return playbackState;
    	}
 
    	////////////////////
-    ////USE MEDIA SOURCE
+    ////USE MEDIA SOURCE - have to do further research, will implement at a later date
     ////////////////////
-    sv.useMediaSource = function (file, chunkAmount) {
-    	//WARNING - this feature is experimental 
-    	//and should be used with caution
-    	chunkAmount = chunkAmount || 5;
+    // sv.useMediaSource = function (file, chunkAmount) {
+    // 	//WARNING - this feature is experimental 
+    // 	//and should be used with caution
+    // 	chunkAmount = chunkAmount || 5;
 
-    	window.MediaSource = window.MediaSource || window.WebKitMediaSource;
+    // 	window.MediaSource = window.MediaSource || window.WebKitMediaSource;
 
-    	var mediaSource = new MediaSource(), sourceBuffer;
+    // 	var 
+    // 		mediaSource = new MediaSource(), sourceBuffer,
+    // 		initSegment = GetInitializationSegment();
 
-    	if (window.MediaSource === undefined) {
-    		sv.log("useMediaSource: MediaSource API is not available in this browser.", "warn");
-    	} else {
-    		videoElement.src = window.URL.createObjectURL(mediaSource);
-    		attachEventListener(mediaSource, "sourceopen", onSourceOpen);
+    // 	if (window.MediaSource === undefined) {
+    // 		sv.log("useMediaSource: MediaSource API is not available in this browser.", "warn");
+    // 	} else {
+    // 		videoElement.src = window.URL.createObjectURL(mediaSource);
+    // 		attachEventListener(mediaSource, "sourceopen", onSourceOpen);
 
-    		function onSourceOpen(evt) {
-    			sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="vorbis,vp8"');
-    		}
-    	}
+    // 		if (initSegment == null) {
+				// // Error fetching the initialization segment. Signal end of stream with an error.
+				// mediaSource.endOfStream("network");
+				// return;
+		  //   }
 
-    	sv.log("window.MediaSource: " + window.MediaSource);
-    }
+    // 		function onSourceOpen(evt) {
+    // 			sourceBuffer = mediaSource.addSourceBuffer('video/webm; codecs="vorbis,vp8"');
+    // 		}
+    // 	}
 
-    //////////////////
-    ////INSERT AFTER
-    //////////////////
-    sv.insertAfter = function (targetElement) {
-        var parent = videoElement.parentNode;
-        parent.insertBefore(videoElement, targetElement.nextSibling);
-    }
-
-    //////////////////
-    ////INSERT BEFORE
-    //////////////////
-    sv.insertBefore = function (targetElement) {
-        var parent = videoElement.parentNode;
-        parent.insertBefore(videoElement, targetElement);
-    }
+    // 	sv.log("window.MediaSource: " + window.MediaSource);
+    // }
 
     //////////////////////
     ////LOG
@@ -1126,19 +1117,21 @@ function SpektralVideo(container, instanceID, params) {
     }
 
     ///////////////////////
-    ////CREATE SET ATTRIBUTE
-    //////////////////////
-    function createSetAttribute(element, attribute, value) {
-        element.setAttribute(attribute, value);
-    }
-
-    ///////////////////////
     ////SET BROWSER WARNING
     //////////////////////
     function setBrowserWarning(message) {
-
-        message = message || "Your browser does not support HTML5 video. Please upgrade your browser."
+        message = message || "<p>Your browser does not support the video element. Please <a href=\"http://browsehappy.com/\">upgrade your browser</a> or <a href=\"http://www.google.com/chromeframe/?redirect=true\">activate Google Chrome Frame</a> to improve your experience.</p>"
         videoElement.innerHTML = message;
+        var 
+        	messageNode = getChildren(videoElement, "p")[0],
+        	anchorNodes = getChildren(messageNode, "a"), i,
+        	novideoStyle = "padding:10px; background-color:#ff0000; color:#fff; font-weight:bold; test-align:center;";
+        	
+        	createSetAttribute(messageNode, "style", novideoStyle);
+
+        	for (i = 0; i < anchorNodes.length; i += 1) {
+        		createSetAttribute(anchorNodes[i], "style", "color:white");
+        	}
     }
 
     ///////////////////////
@@ -1200,7 +1193,6 @@ function SpektralVideo(container, instanceID, params) {
     	sv.log(instanceID + ": an error occurred: " + evt, "warn");
     }
 
-
     //////////////////////
     ////UTILS****************************************************
     //////////////////////
@@ -1226,6 +1218,65 @@ function SpektralVideo(container, instanceID, params) {
         }
         type = type.toLowerCase();
         return type;
+    }
+
+    //////////////////
+    ////GET CHILDREN
+    /////////////////
+    function getChildren(parent, type) {
+        type = type || "all"
+        var
+            children = parent.childNodes,
+            childArr = [], i, isEl, nodeType;
+
+        for (i = 0; i < children.length; i += 1) {
+            isEl = isElement(children[i]);
+            if(isEl === true) {
+                nodeType = getType(children[i]);
+                if (type === "all") {
+                    childArr.push(children[i]);
+                } else {
+                    if (nodeType === type) {
+                        childArr.push(children[i]);
+                    }
+                }
+            }
+        }
+        return childArr;
+    }
+
+    //////////////////
+    ////IS ELEMENT
+    /////////////////
+    function isElement(possibleElement) {
+        var isAnElement = false, type = possibleElement.nodeType;
+        if(type === 1) {
+            isAnElement = true;
+        }
+        return isAnElement;
+    }
+
+    //////////////////
+    ////INSERT AFTER
+    //////////////////
+    function insertAfter(targetElement) {
+        var parent = videoElement.parentNode;
+        parent.insertBefore(videoElement, targetElement.nextSibling);
+    }
+
+    //////////////////
+    ////INSERT BEFORE
+    //////////////////
+    function insertBefore(targetElement) {
+        var parent = videoElement.parentNode;
+        parent.insertBefore(videoElement, targetElement);
+    }
+
+    ///////////////////////
+    ////CREATE SET ATTRIBUTE
+    //////////////////////
+    function createSetAttribute(element, attribute, value) {
+        element.setAttribute(attribute, value);
     }
 
     ///////////////////////
@@ -1615,6 +1666,8 @@ function SpektralVideo(container, instanceID, params) {
     	};
 
         createVideoElement(instanceID);
+
+        setBrowserWarning();
 
         //loadedmetadata
         sv.attachVideoEvent("loadedmetadata", onLoadedMetaData);
