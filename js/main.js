@@ -59,7 +59,7 @@ $(document).ready (function(){
 
 
     //Will work on later
-    //theVideo.setSubtitles("video/bigbuckbunny/bigbuckbunny.vtt", "Closed Captioning", "En", true);
+    theVideo.setSubtitles("video/bigbuckbunny/bigbuckbunny.vtt", "Closed Captioning", true);
 
     //theVideo.getSubtitles();
 
