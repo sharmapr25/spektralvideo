@@ -58,8 +58,18 @@ $(document).ready (function(){
     theVideo.loadFile(vidPathObj);
 
 
-    //Will work on later
-    theVideo.setSubtitles("video/bigbuckbunny/bigbuckbunny.vtt", "Closed Captioning", true);
+    //Single track element
+    //theVideo.setSubtitles("video/bigbuckbunny/bigbuckbunny.vtt", "Closed Captioning", true);
+
+    //Multiple track element
+    var subtitleArray = [
+            {"url" : "video/bigbuckbunny/bigbuckbunny.vtt", "label" : "Closed Captioning", "showing" : true, "defaultTrack" : true, "lang" : "en"},
+            {"url" : "video/bigbuckbunny/bigbuckbunny2.vtt", "label" : "Second Closed Captioning", "showing" : false, "defaultTrack" : false, "lang" : "de"}
+    ];
+
+    theVideo.setSubtitles(subtitleArray);
+
+    theVideo.showSubtitle(1);
 
     //theVideo.getSubtitles();
 

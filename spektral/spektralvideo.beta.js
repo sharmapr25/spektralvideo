@@ -468,20 +468,46 @@ function SpektralVideo(container, instanceID, params) {
     ///////////////////////
     ////SET SUBTITLES
     //////////////////////
-    sv.setSubtitles = function (subUrl, label, showing, isDefault, sourceLang) {
-    	
+    sv.setSubtitles = function (subURL, label, showing, isDefault, sourceLang) {
+    	//Note: track element is not supported in FF.
+    	//https://developer.mozilla.org/en-US/docs/Web/HTML/Element/track
+    	//Will work on a polyfill for future release
+
     	//label, source, sourceLang, isDefault
     	showing = showing || false;
     	isDefault = isDefault || true;
-    	sourceLang = sourceLang || "En";
+    	sourceLang = sourceLang || "en";
     	var 
-    		subUrlType = getType(subUrl);
+    		subUrlType = getType(subURL), subObj, key, i;
 
     	if (subUrlType === "string") {
     		//source, label, showing, isDefault, isDefault
-    		createTrackElement(subUrl, label, showing, isDefault, sourceLang);
+    		createTrackElement(0, subURL, label, showing, isDefault, sourceLang);
     	} else {
+    		for (i = 0; i < subURL.length; i += 1) {
+    			subObj = subURL[i];
+    			createTrackElement(i, subObj.url, subObj.label, subObj.showing, subObj.defaultTrack, subObj.lang);
+    		}
+    	}
+    }
 
+    ///////////////////////
+    ////SHOW SUBTITLE
+    //////////////////////
+    sv.showSubtitle = function (index) {
+    	sv.log("showSubtitle: index: " + index);
+    	var trackList = getChildren(videoElement, "track"), trackName, trackIndex, i;
+    	for (i = 0; i < trackList.length; i += 1) {
+    		trackName = trackList[i].id;
+    		trackIndex = parseInt(trackName.substr(trackName.length - 1, trackName.length));
+    		
+    		if (trackIndex === index) {
+    			videoElement.textTracks[i].mode = "showing";
+    			sv.log("showing: " + trackIndex);
+    		} else {
+    			videoElement.textTracks[i].mode = "hidden";
+    			sv.log("hiding: " + trackIndex);
+    		}
     	}
     }
 
@@ -1064,17 +1090,7 @@ function SpektralVideo(container, instanceID, params) {
 
         var 
         	sourceElem = document.createElement("source"),
-        	typeAndCodec = "";	
-        	
-    //     if (type === "mp4") {
- 			// typeAndCodec = "video/" + type + "; codecs=\"avc1.42E01E, avc1.4D401E, mp4a.40.2\"";
-    //     } else if (type === "webm") {
-    //     	typeAndCodec = "video/" + type + "; codecs=\"vp8.0, vorbis\"";
-    //     } else if (type === "ogg" || type === "ogv") {
-    //     	typeAndCodec = "video/" + type + "; codecs=\"theora, vorbis\"";
-    //     } else if (type === "3gp") {
-    //     	typeAndCodec = "video/3gpp; codecs=\"mp4v.20.8, samr\"";
-    //     }	 
+        	typeAndCodec = "";		 
 
         createSetAttribute(sourceElem, "src", source);
         createSetAttribute(sourceElem, "type", "video/" + type);
@@ -1084,14 +1100,15 @@ function SpektralVideo(container, instanceID, params) {
     ///////////////////////
     ////CREATE TRACK ELEMENT
     //////////////////////
-    function createTrackElement(source, label, showing, isDefault, sourceLang) {
+    function createTrackElement(trackNum, source, label, showing, isDefault, sourceLang) {
 		
-		sv.log("createTrackElement: showing: " + showing);
+		///sv.log("createTrackElement: showing: " + showing);
     	var trackElem = document.createElement("track"), tracks;
-    	createSetAttribute(trackElem, "kind", "subtitles");
-    	createSetAttribute(trackElem, "label", label);
+    	createSetAttribute(trackElem, "id", instanceID + "Track_" + trackNum);
     	createSetAttribute(trackElem, "src", source);
+    	createSetAttribute(trackElem, "kind", "subtitle");
     	createSetAttribute(trackElem, "srclang", sourceLang);
+    	createSetAttribute(trackElem, "label", label);
 
     	if (isDefault === true) {
     		createSetAttribute(trackElem, "default", "");
@@ -1101,7 +1118,7 @@ function SpektralVideo(container, instanceID, params) {
 
     	if (showing === false ) {
     		//showing/hidden
-    		videoElement.textTracks[0].mode = "hidden";
+    		videoElement.textTracks[trackNum].mode = "hidden";
     	}
 
     	sv.log("createTrackElement");
