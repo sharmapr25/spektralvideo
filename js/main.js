@@ -6,7 +6,7 @@ $(document).ready (function(){
         runningTime = "", pbTimer = false, loadTimer,
         sliderTimer = false, isDragging = false,
         sliderValue = 0, useScrub = false,
-        videoMuted,
+        videoMuted, subTrackNum = 0,
         playbackState = "stopped", networkStatus, supportedFormat,
         amountLoaded = 0, sizeButtonArray, sizeButton, j, k,
         controlButtonArray, controlButton,
@@ -64,12 +64,11 @@ $(document).ready (function(){
     //Multiple track element
     var subtitleArray = [
             {"url" : "video/bigbuckbunny/bigbuckbunny.vtt", "label" : "Closed Captioning", "showing" : true, "defaultTrack" : true, "lang" : "en"},
-            {"url" : "video/bigbuckbunny/bigbuckbunny2.vtt", "label" : "Second Closed Captioning", "showing" : false, "defaultTrack" : false, "lang" : "de"}
+            {"url" : "video/bigbuckbunny/bigbuckbunny2.vtt", "label" : "Second Closed Captioning", "showing" : false, "defaultTrack" : false, "lang" : "de"},
+            {"url" : "video/bigbuckbunny/bigbuckbunny3.vtt", "label" : "Third Closed Captioning", "showing" : false, "defaultTrack" : false, "lang" : "fr"}
     ];
 
     theVideo.setSubtitles(subtitleArray);
-
-    theVideo.showSubtitle(1);
 
     //theVideo.getSubtitles();
 
@@ -206,6 +205,16 @@ $(document).ready (function(){
             theVideo.loopSection(startField.value, endField.value);
         } else if (name === "snapshot") {
             theVideo.takeSnapShot(snapShotContainer);
+        } else if (name === "cycleCC") {
+            subTrackNum += 1;
+            if (subTrackNum > 2) {
+                subTrackNum = 0;
+            }
+            theVideo.showSubtitle(subTrackNum);
+        } else if (name === "ccOn") {
+            theVideo.turnOnSubtitles(subTrackNum);
+        } else if (name === "ccOff") {
+            theVideo.turnOffSubtitles();
         }
     }
 

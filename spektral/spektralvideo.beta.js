@@ -495,21 +495,41 @@ function SpektralVideo(container, instanceID, params) {
     ////SHOW SUBTITLE
     //////////////////////
     sv.showSubtitle = function (index) {
-    	sv.log("showSubtitle: index: " + index);
     	var trackList = getChildren(videoElement, "track"), trackName, trackIndex, i;
     	for (i = 0; i < trackList.length; i += 1) {
     		trackName = trackList[i].id;
     		trackIndex = parseInt(trackName.substr(trackName.length - 1, trackName.length));
-    		
     		if (trackIndex === index) {
     			videoElement.textTracks[i].mode = "showing";
-    			sv.log("showing: " + trackIndex);
     		} else {
     			videoElement.textTracks[i].mode = "hidden";
-    			sv.log("hiding: " + trackIndex);
     		}
     	}
     }
+
+    ///////////////////////
+    ////TURN ON SUBTITLES
+    ///////////////////////
+    sv.turnOnSubtitles = function (index) {
+    	index = index || 0;
+    	var trackList = getChildren(videoElement, "track"), i;
+    	for (i = 0; i < trackList.length; i += 1) {
+    		if (i === index) {
+    			videoElement.textTracks[i].mode = "showing";
+    		}
+    	}
+    }
+
+    ///////////////////////
+    ////TURN OFF SUBTITLES
+    //////////////////////
+    sv.turnOffSubtitles = function () {
+    	var trackList = getChildren(videoElement, "track"), i;
+    	for (i = 0; i < trackList.length; i += 1) {
+    		videoElement.textTracks[i].mode = "hidden";
+    	}    	
+    }
+
 
     ///////////////////////
     ////GET SUBTITLES
