@@ -59,24 +59,31 @@ $(document).ready (function(){
 
 
     //Single track element
-    //theVideo.setSubtitles("video/bigbuckbunny/bigbuckbunny.vtt", "Closed Captioning", true);
+    theVideo.setSubtitles("video/bigbuckbunny/bigbuckbunny.vtt", "Closed Captioning", true);
 
     //Multiple track element
-    var subtitleArray = [
-            {"url" : "video/bigbuckbunny/bigbuckbunny.vtt", "label" : "Closed Captioning", "showing" : true, "defaultTrack" : true, "lang" : "en"},
-            {"url" : "video/bigbuckbunny/bigbuckbunny2.vtt", "label" : "Second Closed Captioning", "showing" : false, "defaultTrack" : false, "lang" : "de"},
-            {"url" : "video/bigbuckbunny/bigbuckbunny3.vtt", "label" : "Third Closed Captioning", "showing" : false, "defaultTrack" : false, "lang" : "fr"}
-    ];
+//    var subtitleArray = [
+//            {"url" : "video/bigbuckbunny/bigbuckbunny.vtt", "label" : "Closed Captioning", "showing" : true, "defaultTrack" : true, "lang" : "en"},
+//            {"url" : "video/bigbuckbunny/bigbuckbunny2.vtt", "label" : "Second Closed Captioning", "showing" : false, "defaultTrack" : false, "lang" : "de"},
+//            {"url" : "video/bigbuckbunny/bigbuckbunny3.vtt", "label" : "Third Closed Captioning", "showing" : false, "defaultTrack" : false, "lang" : "fr"}
+//    ];
+//
+//    theVideo.setSubtitles(subtitleArray);
 
-    theVideo.setSubtitles(subtitleArray);
-
-    //theVideo.getSubtitles();
+    theVideo.getSubtitles(onSubtitleChange);
 
     theVideo.attachVideoEvent("playing", onPlaybackStart);
 
     theVideo.onVideoComplete(onPlaybackComplete);
 
     loadTimer = setInterval(getPercentLoaded, 250);
+
+    //////////////////
+    ////ON SUBTITLE CHANGE
+    //////////////////
+    function onSubtitleChange(evt) {
+
+    }
 
     //////////////////
     ////CONTROL BUTTONS
