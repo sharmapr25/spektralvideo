@@ -536,9 +536,7 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.getSubtitles = function (handlers) {
 
-    	sv.log("handlers: change: " + handlers.change);
-    	sv.log("handlers: enter: " + handlers.enter);
-    	sv.log("handlers: exit: " + handlers.exit);
+    	sv.log("handlers: " + JSON.stringify(handlers));
 
   		var 
 			trackElements = getChildren(videoElement, "track"), i, j,
@@ -551,16 +549,17 @@ function SpektralVideo(container, instanceID, params) {
 		}	
 
 		function onSubtitleLoaded(evt) {
-			//sv.log("SUB TITLES LOADED!!!: " + evt.target);
-			sv.log("Subtitles loaded!!!", "dir", evt);
 			textTrack = this.track;
 			isSubtitles = textTrack === "subtitles";
-			attachEventListener(textTrack, "cuechange", onChangeCue);
+			//attachEventListener(textTrack, "cuechange", onChangeCue);
+			attachEventListener(textTrack, "cuechange", handlers.change);
 
 			for (j = 0; j < textTrack.cues.length; j += 1) {
 				cue = textTrack.cues[j];
 				//attachEventListener(cue, "enter", onCueEnter);
 				//attachEventListener(cue, "exit", onCueExit);
+				attachEventListener(cue, "enter", handlers.enter);
+				attachEventListener(cue, "exit", handlers.exit);
 			}
 		}
 

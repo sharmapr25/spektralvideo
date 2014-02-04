@@ -12,6 +12,7 @@ $(document).ready (function(){
         controlButtonArray, controlButton,
         controls = document.getElementById("controlsContainer"),
         snapShotContainer = document.getElementById("snapShotContainer"),
+        ccDisplay = document.getElementById("ccDisplay"),
         timeDisplay = document.getElementById("timeDisplay"),
         playbackDisplay = document.getElementById("playbackDisplay"),
         networkDisplay = document.getElementById("networkDisplay"),
@@ -70,7 +71,7 @@ $(document).ready (function(){
 //
 //    theVideo.setSubtitles(subtitleArray);
 
-    theVideo.getSubtitles(onSubtitleChange);
+    theVideo.getSubtitles({"enter" : onSubtitleEnter, "exit" : onSubtitleExit, "change" : onSubtitleChange});
 
     theVideo.attachVideoEvent("playing", onPlaybackStart);
 
@@ -79,10 +80,24 @@ $(document).ready (function(){
     loadTimer = setInterval(getPercentLoaded, 250);
 
     //////////////////
+    ////ON SUBTITLE ENTER
+    //////////////////
+    function onSubtitleEnter(evt) {
+        ccDisplay.innerHTML = evt.target.text;
+    }
+
+    //////////////////
+    ////ON SUBTITLE EXIT
+    //////////////////
+    function onSubtitleExit(evt) {
+        //console.log("Subtitle Exit");
+    }
+
+    //////////////////
     ////ON SUBTITLE CHANGE
     //////////////////
     function onSubtitleChange(evt) {
-
+        //console.log("Subtitle Change");
     }
 
     //////////////////
