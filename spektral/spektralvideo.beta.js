@@ -536,35 +536,49 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.getSubtitles = function (handlers) {
 
-    	sv.log("handlers: " + JSON.stringify(handlers));
-
   		var 
-			trackElements = getChildren(videoElement, "track"), i, j,
-			textTrack, isSubtitles, cue;
+			trackList = getChildren(videoElement, "track"), i, j, k,
+		    textTrack, isSubtitles, cue, activeTrack, trackName, trackIndex;
 
-		for (i = 0; i < trackElements.length; i += 1) {
-			attachEventListener(trackElements[i], "load", onSubtitleLoaded);
-			sv.log("attaching load to subs");
-			sv.log("trackElements[i]: " + trackElements[i].src);
+		for (i = 0; i < trackList.length; i += 1) {
+			attachEventListener(trackList[i], "load", onSubtitleLoaded);
 		}	
 
 		function onSubtitleLoaded(evt) {
-			textTrack = this.track;
-			isSubtitles = textTrack === "subtitles";
-			//attachEventListener(textTrack, "cuechange", onChangeCue);
-			attachEventListener(textTrack, "cuechange", handlers.change);
+			console.log(this.id);
+			console.dir(this);
 
-			for (j = 0; j < textTrack.cues.length; j += 1) {
+			trackName = this.id;
+			trackIndex = parseInt(trackName.substr(trackName.length - 1, trackName.length));
+			activeTrack = getActiveTrack();
+
+			if (trackIndex === activeTrack) {
+				textTrack = this.track;
+				isSubtitles = textTrack === "subtitles";
+				for (j = 0; j < textTrack.cues.length; j += 1) {
 				cue = textTrack.cues[j];
-				//attachEventListener(cue, "enter", onCueEnter);
+				attachEventListener(cue, "enter", onCueEnter);
 				//attachEventListener(cue, "exit", onCueExit);
-				attachEventListener(cue, "enter", handlers.enter);
-				attachEventListener(cue, "exit", handlers.exit);
 			}
+			}
+
+
+			// activeTrack = getActiveTrack();
+			// textTrack = this.track;
+			// isSubtitles = textTrack === "subtitles";
+			//attachEventListener(textTrack, "cuechange", onChangeCue);
+
+			// for (j = 0; j < textTrack.cues.length; j += 1) {
+			// 	cue = textTrack.cues[j];
+			// 	attachEventListener(cue, "enter", onCueEnter);
+			// 	//attachEventListener(cue, "exit", onCueExit);
+			// }
+
+			//for (j = 0; j < te)
 		}
 
 		function onCueEnter(evt) {
-			sv.log("Cue enter: " + evt.target.text);
+			handlers.enter(evt.target.text);
 		}
 
 		function onCueExit(evt) {
@@ -572,9 +586,20 @@ function SpektralVideo(container, instanceID, params) {
 		}
 
 		function onChangeCue(evt) {
-			// var currentCue = textTrack.activeCues[0];
-			// var obj = currentCue.text;
-			sv.log("onChangeCue!!!!!!: ", "dir", evt);
+			//var activeCue = this.activeCues[0].text;
+			//sv.log("onCueChange: this: " + this);
+			console.log(this);
+		 }
+
+		 function getActiveTrack() {
+		 	var aTrack = false;
+		 	for (k = 0; k < trackList.length; k += 1) {
+		 		sv.log("videoElement.textTracks[k].mode: " + videoElement.textTracks[k].mode);
+		 		if (videoElement.textTracks[k].mode === "showing") {
+		 			aTrack = k;
+		 		}
+		 	}
+		 	return aTrack;
 		 }
 	}
 
@@ -1124,8 +1149,8 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     function createTrackElement(trackNum, source, label, showing, isDefault, sourceLang) {
 		
-		///sv.log("createTrackElement: showing: " + showing);
     	var trackElem = document.createElement("track"), tracks;
+
     	createSetAttribute(trackElem, "id", instanceID + "Track_" + trackNum);
     	createSetAttribute(trackElem, "src", source);
     	createSetAttribute(trackElem, "kind", "subtitle");
@@ -1142,8 +1167,6 @@ function SpektralVideo(container, instanceID, params) {
     		//showing/hidden
     		videoElement.textTracks[trackNum].mode = "hidden";
     	}
-
-    	sv.log("createTrackElement");
     }
 
     ///////////////////////
