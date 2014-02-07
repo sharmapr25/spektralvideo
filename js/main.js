@@ -62,20 +62,16 @@ $(document).ready (function(){
     //Single track element
     //theVideo.setSubtitles("video/bigbuckbunny/bigbuckbunny.vtt", "Closed Captioning", true);
 
+    //default does not show track by default
+
     //Multiple track element
     var subtitleArray = [
-            {"url" : "video/bigbuckbunny/bigbuckbunny.vtt", "label" : "Closed Captioning", "showing" : true, "defaultTrack" : true, "lang" : "en"},
-            {"url" : "video/bigbuckbunny/bigbuckbunny2.vtt", "label" : "Second Closed Captioning", "showing" : false, "defaultTrack" : false, "lang" : "de"},
-            {"url" : "video/bigbuckbunny/bigbuckbunny3.vtt", "label" : "Third Closed Captioning", "showing" : false, "defaultTrack" : false, "lang" : "fr"}
+            {"url" : "video/bigbuckbunny/bigbuckbunny2.vtt", "label" : "Second Closed Captioning", "defaultTrack" : true, "lang" : "de"},
+            {"url" : "video/bigbuckbunny/bigbuckbunny3.vtt", "label" : "Third Closed Captioning",  "defaultTrack" : false, "lang" : "fr"},
+            {"url" : "video/bigbuckbunny/bigbuckbunny.vtt", "label" : "Closed Captioning",  "defaultTrack" : false, "lang" : "en"}
     ];
 
     theVideo.setSubtitles(subtitleArray);
-
-    //NOTE: currently if you use subtitle array, all three cues are return to onSubtitleEnter,
-    //what I need to do is find a way to determine the active track, in order to return the one cue I actually want
-
-    //Another thought is to have getSubtitles to only attach event listeners to the active track
-    //when a track is changed, remove event listener of old track and add them to active track
 
     theVideo.getSubtitles({"enter" : onSubtitleEnter, "exit" : onSubtitleExit, "change" : onSubtitleChange});
 
@@ -155,6 +151,7 @@ $(document).ready (function(){
 
         if(name === "play") {
             theVideo.play({"regularSpeed" : true});
+            theVideo.getVisibleSubtitle();
         } else if (name === "pause") {
             theVideo.pause();
         } else if (name === "togglePause") {
@@ -240,6 +237,7 @@ $(document).ready (function(){
                 subTrackNum = 0;
             }
             theVideo.showSubtitle(subTrackNum);
+            theVideo.getSubtitles({"enter" : onSubtitleEnter, "exit" : onSubtitleExit, "change" : onSubtitleChange});
         } else if (name === "ccOn") {
             theVideo.turnOnSubtitles(subTrackNum);
         } else if (name === "ccOff") {

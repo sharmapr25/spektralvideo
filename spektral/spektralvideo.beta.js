@@ -11,7 +11,7 @@ function SpektralVideo(container, instanceID, params) {
         debug = false, strictError = false, videoElement, currentPlaybackSpeed = 1,
  		playbackState = "stopped", muteState = "unmuted", videoLooped = false,
         rewindTimer, rewindTimerStarted = false,  rewindRate = 0,
-        playbackTimer, playbackComplete, possibleFormats, poster;
+        playbackTimer, playbackComplete, possibleFormats, poster, subTitlesLoaded = false;
 
     ///////////////////////
     ////GET VIDEO ELEMENT
@@ -24,9 +24,7 @@ function SpektralVideo(container, instanceID, params) {
     ////LOAD FILE
     //////////////////////
     sv.loadFile = function (newPath, autoplay) {
-
         autoplay = autoplay || false;
-
         var 
             pathType = getType(newPath),
             videoType, autoplayTimer, key;
@@ -42,14 +40,12 @@ function SpektralVideo(container, instanceID, params) {
             	createSourceElement(newPath[key], videoType);
             }
         }
-
         if (autoplay === true) {
         	videoElement.autoplay = true;
         	readyToPlay(function() {
         		sv.play();
         	});
         }
-        //sv.log("loadFile: path: " + pathType);
     }
 
     ///////////////////////
@@ -180,7 +176,6 @@ function SpektralVideo(container, instanceID, params) {
     ////SEEK AND PLAY
     //////////////////////
     sv.seekAndPlay = function (time) {	
-
     	var seekTime = sv.convertToSeconds(time);
     	readyToPlay(function() {
     		sv.seek(seekTime);
@@ -530,23 +525,36 @@ function SpektralVideo(container, instanceID, params) {
     	}    	
     }
 
+    ///////////////////////
+    ////GET VISIBLE SUBTITLE
+    //////////////////////
+    sv.getVisibleSubtitle = function () {
+    	var trackList = getChildren(videoElement, "track"), i, vMode;
+    	for (i = 0; i < trackList.length; i += 1) {
+    		vMode = videoElement.textTracks[i].mode;
+    		sv.log("getVisibleSubtitle: vMode: " + vMode);
+    	}    	
+    }
+
 
     ///////////////////////
     ////GET SUBTITLES
     //////////////////////
     sv.getSubtitles = function (handlers) {
-
+    	sv.log("getSubtitles");
   		var 
-			trackList = getChildren(videoElement, "track"), i, j, k,
+			trackList = getChildren(videoElement, "track"), i, j, k, l,
 		    textTrack, isSubtitles, cue, activeTrack, trackName, trackIndex;
 
 		for (i = 0; i < trackList.length; i += 1) {
 			attachEventListener(trackList[i], "load", onSubtitleLoaded);
+			sv.log("Track: " + i + " visible: " + videoElement.textTracks[i].mode);
 		}	
 
 		function onSubtitleLoaded(evt) {
-			console.log(this.id);
-			console.dir(this);
+			//console.log(this.id);
+			//console.dir(this);
+			sv.log("subtitle loaded");
 
 			trackName = this.id;
 			trackIndex = parseInt(trackName.substr(trackName.length - 1, trackName.length));
@@ -556,25 +564,11 @@ function SpektralVideo(container, instanceID, params) {
 				textTrack = this.track;
 				isSubtitles = textTrack === "subtitles";
 				for (j = 0; j < textTrack.cues.length; j += 1) {
-				cue = textTrack.cues[j];
-				attachEventListener(cue, "enter", onCueEnter);
-				//attachEventListener(cue, "exit", onCueExit);
+					cue = textTrack.cues[j];
+					//attachEventListener(cue, "enter", onCueEnter);
+					//attachEventListener(cue, "exit", onCueExit);
+				}
 			}
-			}
-
-
-			// activeTrack = getActiveTrack();
-			// textTrack = this.track;
-			// isSubtitles = textTrack === "subtitles";
-			//attachEventListener(textTrack, "cuechange", onChangeCue);
-
-			// for (j = 0; j < textTrack.cues.length; j += 1) {
-			// 	cue = textTrack.cues[j];
-			// 	attachEventListener(cue, "enter", onCueEnter);
-			// 	//attachEventListener(cue, "exit", onCueExit);
-			// }
-
-			//for (j = 0; j < te)
 		}
 
 		function onCueEnter(evt) {
@@ -594,7 +588,7 @@ function SpektralVideo(container, instanceID, params) {
 		 function getActiveTrack() {
 		 	var aTrack = false;
 		 	for (k = 0; k < trackList.length; k += 1) {
-		 		sv.log("videoElement.textTracks[k].mode: " + videoElement.textTracks[k].mode);
+		 		//sv.log("videoElement.textTracks[k].mode: " + videoElement.textTracks[k].mode);
 		 		if (videoElement.textTracks[k].mode === "showing") {
 		 			aTrack = k;
 		 		}
@@ -689,7 +683,6 @@ function SpektralVideo(container, instanceID, params) {
     	var dimensions = {};
     	dimensions["width"] = videoElement.width;
     	dimensions["height"] = videoElement.height;
-    	//sv.log("getDimensions: width: " + videoElement.width + " height: " + videoElement.height);
     	return dimensions;
     }
 
@@ -1086,10 +1079,8 @@ function SpektralVideo(container, instanceID, params) {
     ////LOG
     //////////////////////
     sv.log = function (message, method, obj) {
-
         method = method || "log";
         var err, ID = "SpektralVideo: " + instanceID + ": ";
-
         if (debug) {
             if(method === "dir") {
                 console.log(ID + message);
@@ -1114,7 +1105,6 @@ function SpektralVideo(container, instanceID, params) {
     ////CREATE VIDEO ELEMENT
     //////////////////////
     function createVideoElement(elID) {
-
         videoElement = document.createElement("video");
         createSetAttribute(videoElement, "id", elID);
         createSetAttribute(videoElement, "style", "visibility:hidden");
@@ -1134,7 +1124,6 @@ function SpektralVideo(container, instanceID, params) {
     ////CREATE SOURCE ELEMENT
     //////////////////////
     function createSourceElement(source, type) {
-
         var 
         	sourceElem = document.createElement("source"),
         	typeAndCodec = "";		 
@@ -1147,8 +1136,7 @@ function SpektralVideo(container, instanceID, params) {
     ///////////////////////
     ////CREATE TRACK ELEMENT
     //////////////////////
-    function createTrackElement(trackNum, source, label, showing, isDefault, sourceLang) {
-		
+    function createTrackElement(trackNum, source, label, showing, isDefault, sourceLang) {	
     	var trackElem = document.createElement("track"), tracks;
 
     	createSetAttribute(trackElem, "id", instanceID + "Track_" + trackNum);
@@ -1163,10 +1151,10 @@ function SpektralVideo(container, instanceID, params) {
 
     	videoElement.appendChild(trackElem);
 
-    	if (showing === false ) {
-    		//showing/hidden
-    		videoElement.textTracks[trackNum].mode = "hidden";
-    	}
+    	// if (showing === false ) {
+    	// 	//showing/hidden
+    	// 	videoElement.textTracks[trackNum].mode = "hidden";
+    	// }
     }
 
     ///////////////////////
@@ -1464,9 +1452,7 @@ function SpektralVideo(container, instanceID, params) {
     ////SPLIT STRING
     //////////////////
     function splitString(request, character) {
-
         character = character || ",";
-
         var 
             splitArray = [], split, 
             i, detectCharacter = matchPattern(request, character).isMatch, 
@@ -1589,7 +1575,6 @@ function SpektralVideo(container, instanceID, params) {
     ////GET HASH STRING
     ////////////////////
     function getHashString() {
-
         var 
             hashParams = {},
             hash = window.location.hash,
@@ -1762,28 +1747,23 @@ function SpektralVideo(container, instanceID, params) {
 
         //Check for time in hash
         checkHashForTime();
-
         //Path
         if (path !== "none") {
         	sv.loadFile(path);
         }
-
         //Controls
         //currently is being set larger than it should be
         if (useDefaultControls === true) {
             createSetAttribute(videoElement, "controls");
         }
-
         //Autoplay
         if (autoplayVideo === true) {
         	createSetAttribute(videoElement, "autoplay");
         }
-
         //Mute
         if (videoMuted === true) {
         	sv.mute();
         } 
-
         //Preload
         if (preload !== "none") {
         	sv.preloadVideo(preload);
