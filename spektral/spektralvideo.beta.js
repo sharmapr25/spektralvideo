@@ -463,7 +463,7 @@ function SpektralVideo(container, instanceID, params) {
     ///////////////////////
     ////SET SUBTITLES
     //////////////////////
-    sv.setSubtitles = function (subURL, label, showing, isDefault, sourceLang) {
+    sv.setSubtitles = function (subURL, label, isDefault, sourceLang, showing) {
     	//Note: track element is not supported in FF.
     	//https://developer.mozilla.org/en-US/docs/Web/HTML/Element/track
     	//Will work on a polyfill for future release
@@ -484,6 +484,8 @@ function SpektralVideo(container, instanceID, params) {
     			createTrackElement(i, subObj.url, subObj.label, subObj.showing, subObj.defaultTrack, subObj.lang);
     		}
     	}
+    	//Uncomment when done subtitle work
+    	//sv.turnOffSubtitles();
     }
 
     ///////////////////////
@@ -536,6 +538,19 @@ function SpektralVideo(container, instanceID, params) {
     	}    	
     }
 
+    ///////////////////////
+    ////GET ACTIVE SUBTITLE TRACK
+    //////////////////////
+    sv.getActiveSubTitleTrack = function () {
+    	var activeTrack = false, trackList = getChildren(videoElement, "track"), i;
+	 	for (i = 0; i < trackList.length; i += 1) {
+	 		if (videoElement.textTracks[i].mode === "showing") {
+	 			activeTrack = i;
+	 		}
+	 	}
+	 	return activeTrack;
+    }
+
 
     ///////////////////////
     ////GET SUBTITLES
@@ -548,14 +563,9 @@ function SpektralVideo(container, instanceID, params) {
 
 		for (i = 0; i < trackList.length; i += 1) {
 			attachEventListener(trackList[i], "load", onSubtitleLoaded);
-			sv.log("Track: " + i + " visible: " + videoElement.textTracks[i].mode);
 		}	
 
 		function onSubtitleLoaded(evt) {
-			//console.log(this.id);
-			//console.dir(this);
-			sv.log("subtitle loaded");
-
 			trackName = this.id;
 			trackIndex = parseInt(trackName.substr(trackName.length - 1, trackName.length));
 			activeTrack = getActiveTrack();
@@ -565,8 +575,14 @@ function SpektralVideo(container, instanceID, params) {
 				isSubtitles = textTrack === "subtitles";
 				for (j = 0; j < textTrack.cues.length; j += 1) {
 					cue = textTrack.cues[j];
-					//attachEventListener(cue, "enter", onCueEnter);
-					//attachEventListener(cue, "exit", onCueExit);
+					attachEventListener(cue, "enter", onCueEnter);
+					attachEventListener(cue, "exit", onCueExit);
+				}
+			} else {
+				for (l = 0; l < textTrack.cues.length; l += 1) {
+					cue = textTrack.cues[l];
+					detachEventListener(cue, "enter", onCueEnter);
+					detachEventListener(cue, "exit", onCueExit);
 				}
 			}
 		}
@@ -576,7 +592,7 @@ function SpektralVideo(container, instanceID, params) {
 		}
 
 		function onCueExit(evt) {
-			sv.log("Cue exit: " + evt);
+			handlers.exit(evt.target.text);
 		}
 
 		function onChangeCue(evt) {
@@ -1152,8 +1168,8 @@ function SpektralVideo(container, instanceID, params) {
     	videoElement.appendChild(trackElem);
 
     	// if (showing === false ) {
-    	// 	//showing/hidden
-    	// 	videoElement.textTracks[trackNum].mode = "hidden";
+    	// 	//showing/hidden/disabled
+    	// 	videoElement.textTracks[trackNum].mode = "disabled";
     	// }
     }
 

@@ -66,9 +66,9 @@ $(document).ready (function(){
 
     //Multiple track element
     var subtitleArray = [
-            {"url" : "video/bigbuckbunny/bigbuckbunny2.vtt", "label" : "Second Closed Captioning", "defaultTrack" : true, "lang" : "de"},
-            {"url" : "video/bigbuckbunny/bigbuckbunny3.vtt", "label" : "Third Closed Captioning",  "defaultTrack" : false, "lang" : "fr"},
-            {"url" : "video/bigbuckbunny/bigbuckbunny.vtt", "label" : "Closed Captioning",  "defaultTrack" : false, "lang" : "en"}
+            {"url" : "video/bigbuckbunny/bigbuckbunny.vtt", "label" : "Closed Captioning",  "defaultTrack" : true, "lang" : "en"},
+            {"url" : "video/bigbuckbunny/bigbuckbunny2.vtt", "label" : "Second Closed Captioning", "defaultTrack" : false, "lang" : "de"},
+            {"url" : "video/bigbuckbunny/bigbuckbunny3.vtt", "label" : "Third Closed Captioning",  "defaultTrack" : false, "lang" : "fr"}
     ];
 
     theVideo.setSubtitles(subtitleArray);
@@ -85,15 +85,14 @@ $(document).ready (function(){
     ////ON SUBTITLE ENTER
     //////////////////
     function onSubtitleEnter(evt) {
-        //ccDisplay.innerHTML = evt.target.text;
-        console.log("onSubtitleEnter: evt: " + evt);
+        ccDisplay.innerHTML = evt;
     }
 
     //////////////////
     ////ON SUBTITLE EXIT
     //////////////////
     function onSubtitleExit(evt) {
-        //console.log("Subtitle Exit");
+        console.log("Subtitle Exit: " + evt);
     }
 
     //////////////////
