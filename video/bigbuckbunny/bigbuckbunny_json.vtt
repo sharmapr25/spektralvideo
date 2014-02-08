@@ -1,0 +1,13 @@
+WEBVTT
+
+00:00:02.000 --> 00:00:06.000
+{"title" : "First caption title", "description" : "Here is the description for the first caption"}
+
+00:00:08.000 --> 00:00:12.000
+{"title" : "Second caption title", "description" : "Here is the description for the second caption"}
+
+00:00:15.000 --> 00:00:20.000
+{"title" : "Third caption title", "description" : "Here is the description for the third caption"}
+
+00:00:25.000 --> 00:00:30.000
+{"title" : "Fourth caption title", "description" : "Here is the description for the fourth caption"}

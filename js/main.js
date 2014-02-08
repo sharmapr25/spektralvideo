@@ -9,7 +9,7 @@ $(document).ready (function(){
         videoMuted, subTrackNum = 0,
         playbackState = "stopped", networkStatus, supportedFormat,
         amountLoaded = 0, sizeButtonArray, sizeButton, j, k,
-        controlButtonArray, controlButton,
+        controlButtonArray, controlButton, subtitleArray,
         controls = document.getElementById("controlsContainer"),
         snapShotContainer = document.getElementById("snapShotContainer"),
         ccDisplay = document.getElementById("ccDisplay"),
@@ -65,15 +65,23 @@ $(document).ready (function(){
     //default does not show track by default
 
     //Multiple track element
-    var subtitleArray = [
+    subtitleArray = [
             {"url" : "video/bigbuckbunny/bigbuckbunny.vtt", "label" : "Closed Captioning",  "defaultTrack" : true, "lang" : "en"},
             {"url" : "video/bigbuckbunny/bigbuckbunny2.vtt", "label" : "Second Closed Captioning", "defaultTrack" : false, "lang" : "de"},
             {"url" : "video/bigbuckbunny/bigbuckbunny3.vtt", "label" : "Third Closed Captioning",  "defaultTrack" : false, "lang" : "fr"}
     ];
 
+    //Subtitle file with JSON
+//    subtitleArray = [
+//        {"url" : "video/bigbuckbunny/bigbuckbunny_json.vtt", "label" : "Closed Captioning",  "defaultTrack" : true, "lang" : "en"}
+//    ];
+
+
     theVideo.setSubtitles(subtitleArray);
 
     theVideo.getSubtitles({"enter" : onSubtitleEnter, "exit" : onSubtitleExit, "change" : onSubtitleChange});
+
+    theVideo.turnOnSubtitles();
 
     theVideo.attachVideoEvent("playing", onPlaybackStart);
 
@@ -86,6 +94,9 @@ $(document).ready (function(){
     //////////////////
     function onSubtitleEnter(cue) {
         ccDisplay.innerHTML = cue.text;
+//        var obj = JSON.parse(cue.text);
+//        console.log("title: " + obj.title);
+//        console.log("description: " + obj.description);
     }
 
     //////////////////
@@ -99,7 +110,7 @@ $(document).ready (function(){
     ////ON SUBTITLE CHANGE
     //////////////////
     function onSubtitleChange(track) {
-       console.log(track.id);
+       //console.log(track.id);
     }
 
     //////////////////
