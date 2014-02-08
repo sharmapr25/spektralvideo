@@ -99,7 +99,7 @@ $(document).ready (function(){
     ////ON SUBTITLE CHANGE
     //////////////////
     function onSubtitleChange(track) {
-       console.log(track.language);
+       console.log(track.id);
     }
 
     //////////////////

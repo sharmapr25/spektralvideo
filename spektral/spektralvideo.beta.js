@@ -557,9 +557,9 @@ function SpektralVideo(container, instanceID, params) {
     //////////////////////
     sv.getSubtitles = function (handlers) {
   		var 
-			trackList = getChildren(videoElement, "track"), i, j, k, l,
-		    textTrack, isSubtitles, cue, activeTrack, trackName, trackIndex;
-
+			trackList = getChildren(videoElement, "track"), i, j, k, l, m,
+		    textTrack, isSubtitles, cue, activeTrack, trackName, trackIndex, isActive;
+		
 		for (i = 0; i < trackList.length; i += 1) {
 			if (subTitlesLoaded === false) {
 				attachEventListener(trackList[i], "load", onSubtitleLoaded);
@@ -581,14 +581,14 @@ function SpektralVideo(container, instanceID, params) {
 			isSubtitles = textTrack === "subtitles";//Not sure if I need this
 
 			if (trackIndex === activeTrack) {
-				attachEventListener(textTrack, "cuechange", onChangeCue);
+				subTrack.oncuechange = onChangeCue;
 				for (j = 0; j < textTrack.cues.length; j += 1) {
 					cue = textTrack.cues[j];
 					attachEventListener(cue, "enter", onCueEnter);
 					attachEventListener(cue, "exit", onCueExit);
 				}
 			} else {
-				detachEventListener(textTrack, "cuechange", onChangeCue);
+				subTrack.oncuechange = null;
 				for (l = 0; l < textTrack.cues.length; l += 1) {
 					cue = textTrack.cues[l];
 					detachEventListener(cue, "enter", onCueEnter);
