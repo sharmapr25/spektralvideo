@@ -556,29 +556,39 @@ function SpektralVideo(container, instanceID, params) {
     ////GET SUBTITLES
     //////////////////////
     sv.getSubtitles = function (handlers) {
-    	sv.log("getSubtitles");
   		var 
 			trackList = getChildren(videoElement, "track"), i, j, k, l,
 		    textTrack, isSubtitles, cue, activeTrack, trackName, trackIndex;
 
 		for (i = 0; i < trackList.length; i += 1) {
-			attachEventListener(trackList[i], "load", onSubtitleLoaded);
+			if (subTitlesLoaded === false) {
+				attachEventListener(trackList[i], "load", onSubtitleLoaded);
+			} else {
+				attachCueEvents(trackList[i]);
+			}
 		}	
 
 		function onSubtitleLoaded(evt) {
-			trackName = this.id;
+			attachCueEvents(this);
+			subTitlesLoaded = true;
+		}
+
+		function attachCueEvents(subTrack) {
+			trackName = subTrack.id;
 			trackIndex = parseInt(trackName.substr(trackName.length - 1, trackName.length));
 			activeTrack = getActiveTrack();
+			textTrack = subTrack.track;
+			isSubtitles = textTrack === "subtitles";//Not sure if I need this
 
 			if (trackIndex === activeTrack) {
-				textTrack = this.track;
-				isSubtitles = textTrack === "subtitles";
+				attachEventListener(textTrack, "cuechange", onChangeCue);
 				for (j = 0; j < textTrack.cues.length; j += 1) {
 					cue = textTrack.cues[j];
 					attachEventListener(cue, "enter", onCueEnter);
 					attachEventListener(cue, "exit", onCueExit);
 				}
 			} else {
+				detachEventListener(textTrack, "cuechange", onChangeCue);
 				for (l = 0; l < textTrack.cues.length; l += 1) {
 					cue = textTrack.cues[l];
 					detachEventListener(cue, "enter", onCueEnter);
@@ -588,29 +598,26 @@ function SpektralVideo(container, instanceID, params) {
 		}
 
 		function onCueEnter(evt) {
-			handlers.enter(evt.target.text);
+			handlers.enter(evt.target);
 		}
 
 		function onCueExit(evt) {
-			handlers.exit(evt.target.text);
+			handlers.exit(evt.target);
 		}
 
 		function onChangeCue(evt) {
-			//var activeCue = this.activeCues[0].text;
-			//sv.log("onCueChange: this: " + this);
-			console.log(this);
-		 }
+			handlers.change(this);
+		}
 
-		 function getActiveTrack() {
-		 	var aTrack = false;
-		 	for (k = 0; k < trackList.length; k += 1) {
-		 		//sv.log("videoElement.textTracks[k].mode: " + videoElement.textTracks[k].mode);
-		 		if (videoElement.textTracks[k].mode === "showing") {
-		 			aTrack = k;
-		 		}
-		 	}
-		 	return aTrack;
-		 }
+		function getActiveTrack() {
+			var aTrack = false;
+			for (k = 0; k < trackList.length; k += 1) {
+				if (videoElement.textTracks[k].mode === "showing") {
+					aTrack = k;
+				}
+			}
+			return aTrack;
+		}
 	}
 
     ///////////////////////

@@ -84,22 +84,22 @@ $(document).ready (function(){
     //////////////////
     ////ON SUBTITLE ENTER
     //////////////////
-    function onSubtitleEnter(evt) {
-        ccDisplay.innerHTML = evt;
+    function onSubtitleEnter(cue) {
+        ccDisplay.innerHTML = cue.text;
     }
 
     //////////////////
     ////ON SUBTITLE EXIT
     //////////////////
-    function onSubtitleExit(evt) {
-        console.log("Subtitle Exit: " + evt);
+    function onSubtitleExit(cue) {
+        ccDisplay.innerHTML = "***";
     }
 
     //////////////////
     ////ON SUBTITLE CHANGE
     //////////////////
-    function onSubtitleChange(evt) {
-        //ccDisplay.innerHTML = evt.target.text;
+    function onSubtitleChange(track) {
+       console.log(track.language);
     }
 
     //////////////////
