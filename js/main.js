@@ -76,12 +76,11 @@ $(document).ready (function(){
 //        {"url" : "video/bigbuckbunny/bigbuckbunny_json.vtt", "label" : "Closed Captioning",  "defaultTrack" : true, "lang" : "en"}
 //    ];
 
-
     theVideo.setSubtitles(subtitleArray);
 
     theVideo.getSubtitles({"enter" : onSubtitleEnter, "exit" : onSubtitleExit, "change" : onSubtitleChange});
 
-    theVideo.turnOnSubtitles();
+    //theVideo.turnOnSubtitles();
 
     theVideo.attachVideoEvent("playing", onPlaybackStart);
 
@@ -161,7 +160,6 @@ $(document).ready (function(){
 
         if(name === "play") {
             theVideo.play({"regularSpeed" : true});
-            theVideo.getVisibleSubtitle();
         } else if (name === "pause") {
             theVideo.pause();
         } else if (name === "togglePause") {
