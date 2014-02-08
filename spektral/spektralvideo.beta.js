@@ -61,7 +61,6 @@ function SpektralVideo(container, instanceID, params) {
     ////PLAY
     //////////////////////
     sv.play = function (playParams) {
-
         //Check to see if source is set
         sv.getCurrentSource();
 
@@ -187,7 +186,6 @@ function SpektralVideo(container, instanceID, params) {
     ////REWIND
     //////////////////////
     sv.rewind = function (muteSound, speed) {
-
         muteSound = muteSound || false;
         speed = speed;
 
@@ -230,7 +228,6 @@ function SpektralVideo(container, instanceID, params) {
     ////FAST FORWARD
     //////////////////////
     sv.fastForward = function () {
-
         if(playbackState === "rewinding") {
             clearTimer(rewindTimer);
             rewindTimerStarted = false;
@@ -297,7 +294,6 @@ function SpektralVideo(container, instanceID, params) {
     ////PLAYBACK SPEED
     //////////////////////
     sv.playbackSpeed = function (speed) {
-
         speed = speed || 1;
         currentPlaybackSpeed = speed;
         videoElement.playbackRate = currentPlaybackSpeed;
@@ -307,7 +303,6 @@ function SpektralVideo(container, instanceID, params) {
     ////PLAY SECTION
     //////////////////////
     sv.playSection = function (start, end) {
-
         var 
             timeChecker, startTime = sv.convertToSeconds(start),
             endTime = sv.convertToSeconds(end);
@@ -600,7 +595,6 @@ function SpektralVideo(container, instanceID, params) {
     ////SET SIZE
     //////////////////////
     sv.setSize =  function (sizeParams) {
-
         //sizeParams can either be an object or string
         //If an object it should look like this: 
         //{"width" : "640", "height" : "320"}
@@ -647,15 +641,6 @@ function SpektralVideo(container, instanceID, params) {
                 sv.setHeight(viewport.height);
             }
         }
-
-        //sizeParams can be a string with a video standard
-        //Ex. "1080" = 1920x1080, "svga" = 800x600
-
-        //320 - 640 x 320
-        //480 - 854 x 480
-        //720 - 1280 x 720
-        //1080 - 1920 x 1080
-
         //https://support.google.com/youtube/answer/1722171?hl=en
     }
 
@@ -1175,7 +1160,6 @@ function SpektralVideo(container, instanceID, params) {
             //Set predefined height
             createSetAttribute(videoElement, "height", height);
         }
-
         createSetAttribute(videoElement, "style", "visibility:visible");
     }
 
@@ -1319,22 +1303,6 @@ function SpektralVideo(container, instanceID, params) {
         return isAnElement;
     }
 
-    //////////////////
-    ////INSERT AFTER
-    //////////////////
-    function insertAfter(targetElement) {
-        var parent = videoElement.parentNode;
-        parent.insertBefore(videoElement, targetElement.nextSibling);
-    }
-
-    //////////////////
-    ////INSERT BEFORE
-    //////////////////
-    function insertBefore(targetElement) {
-        var parent = videoElement.parentNode;
-        parent.insertBefore(videoElement, targetElement);
-    }
-
     ///////////////////////
     ////CREATE SET ATTRIBUTE
     //////////////////////
@@ -1392,7 +1360,6 @@ function SpektralVideo(container, instanceID, params) {
     ////CREATE EVENT
     /////////////////
     function createEvent(eventName, detail, bub, can) {
-
         detail = detail || null;
         bub = bub || true;
         can = can || true;
@@ -1416,7 +1383,6 @@ function SpektralVideo(container, instanceID, params) {
     ////CREATE TIMER
     ////////////////////
     function createTimer(time, handler) {
-
         var convertedTime = time * 1000;
         return setInterval(handler, convertedTime);
     }
@@ -1433,7 +1399,6 @@ function SpektralVideo(container, instanceID, params) {
     ////CREATE TIME OUT
     ////////////////////
     function createTimeout(time, handler) {
-
         var convertedTime = time * 1000;
         setTimeout(handler, convertedTime);
     }
@@ -1599,7 +1564,6 @@ function SpektralVideo(container, instanceID, params) {
     ////GET QUERY STRING
     ////////////////////
     function getQueryString() {
-
         var 
             queryParams = {},
             query = window.location.search,
@@ -1621,7 +1585,6 @@ function SpektralVideo(container, instanceID, params) {
     ////MATCH PATTERN
     //////////////////
     function matchPattern(request, pattern) {
-
         var 
             regEx = new RegExp(pattern, "g"),
             matches = request.match(regEx),
@@ -1645,8 +1608,7 @@ function SpektralVideo(container, instanceID, params) {
     ////////////////////
     ////CHECK HASH FOR TIME
     ////////////////////
-    function checkHashForTime() {
-        
+    function checkHashForTime() {  
         var 
             timeValue = getHashValue("t"), 
             loopValue = getHashValue("loop"),
