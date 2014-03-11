@@ -1,0 +1,18 @@
+{
+    "name": "spektralvideo",
+    "description": "Spektral Video build package file.",
+    "author": "David Boyle",
+    "dependencies": {
+        "grunt": "0.x.x",
+        "grunt-autoprefixer": "0.2.x",
+        "grunt-contrib-clean": "0.5.x",
+        "grunt-contrib-connect": "0.4.x",
+        "grunt-contrib-copy": "0.4.x",
+        "grunt-contrib-uglify": "0.2.x",
+        "grunt-contrib-watch": "0.5.x"
+    },
+    "engine": "node >= 0.8.0",
+    "devDependencies": {
+        "grunt-contrib-jasmine": "~0.6.1"
+    }
+}
